@@ -1,5 +1,5 @@
 const express = require('express');
-const NguyenVatLieu = require('../../models/nguyenvatlieuModel');
+const NguyenVatLieu = require('../../models/nguyenVatlieuModel');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const { validate } = require('../../Middleware/validationMiddleware');
 const router = express.Router();
