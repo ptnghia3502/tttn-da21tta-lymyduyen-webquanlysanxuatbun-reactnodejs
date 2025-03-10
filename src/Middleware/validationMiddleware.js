@@ -111,6 +111,49 @@ const roleSchema = {
   })
 };
 
+// Thêm schema cho nguyên liệu
+const nguyenLieuSchema = {
+  create: Joi.object({
+    tenNguyenLieu: Joi.string()
+      .min(2)
+      .max(100)
+      .required()
+      .messages({
+        'string.empty': 'Tên nguyên liệu không được để trống',
+        'string.min': 'Tên nguyên liệu phải có ít nhất {#limit} ký tự',
+        'string.max': 'Tên nguyên liệu không được vượt quá {#limit} ký tự'
+      }),
+    moTa: Joi.string()
+      .max(500)
+      .allow('', null),
+    donViTinhId: Joi.number()
+      .required()
+      .messages({
+        'number.base': 'Đơn vị tính không hợp lệ'
+      }),
+    soLuong: Joi.number()
+      .min(0)
+      .required()
+      .messages({
+        'number.base': 'Số lượng không hợp lệ',
+        'number.min': 'Số lượng không được âm'
+      }),
+    gia: Joi.number()
+      .min(0)
+      .required()
+      .messages({
+        'number.base': 'Giá không hợp lệ',
+        'number.min': 'Giá không được âm'
+      }),
+    trangThai: Joi.number()
+      .valid(0, 1)
+      .required()
+      .messages({
+        'any.only': 'Trạng thái không hợp lệ'
+      })
+  })
+};
+
 // Middleware validation
 const validate = (schema) => {
   return (req, res, next) => {
@@ -137,8 +180,22 @@ const validate = (schema) => {
   };
 };
 
+// Bổ sung validation cho các request params
+const validateId = (req, res, next) => {
+  const id = parseInt(req.params.id);
+  if (isNaN(id) || id <= 0) {
+    return res.status(400).json({
+      success: false,
+      message: 'ID không hợp lệ'
+    });
+  }
+  next();
+};
+
 module.exports = {
   userSchema,
   roleSchema,
-  validate
+  validate,
+  validateId,
+  nguyenLieuSchema
 }; 
