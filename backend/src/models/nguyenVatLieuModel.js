@@ -53,7 +53,7 @@ class NguyenVatLieu {
     const result = await query(sql, [
       data.Ten_nguyen_lieu,
       data.Gia,
-      data.So_luong_ton || 0,
+      0, 
       data.Don_vi_tinh
     ]);
 
@@ -66,7 +66,6 @@ class NguyenVatLieu {
       SET 
         Ten_nguyen_lieu = ?,
         Gia = ?,
-        So_luong_ton = ?,
         Don_vi_tinh = ?,
         Ngay_cap_nhat = CURRENT_DATE
       WHERE Id = ?
@@ -75,7 +74,7 @@ class NguyenVatLieu {
     return query(sql, [
       data.Ten_nguyen_lieu,
       data.Gia,
-      data.So_luong_ton,
+      // data.So_luong_ton,
       data.Don_vi_tinh,
       id
     ]);
