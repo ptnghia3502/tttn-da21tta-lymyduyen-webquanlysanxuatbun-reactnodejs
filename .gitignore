@@ -1,1 +1,48 @@
+<<<<<<< HEAD
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Environment variables
+.env
+
+!.env.example
+
+# Database scripts
+/src/Database/script_CSDL_old.sql
+/src/Database/Script_EDIT.sql
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temporary files
+*.tmp
+*.temp
+.cache
+=======
 node_modules/
+>>>>>>> 4fb76d5cb6eeef137ebe5227cc8cea038becfe21

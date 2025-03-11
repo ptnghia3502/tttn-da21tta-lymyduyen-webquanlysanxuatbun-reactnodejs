@@ -1,4 +1,30 @@
 {
+<<<<<<< HEAD
+  "name": "quanlysanxuatbun-api",
+  "version": "1.0.0",
+  "description": "API quản lý sản xuất bún",
+  "main": "src/Server.js",
+  "scripts": {
+    "start": "node src/Server.js",
+    "dev": "nodemon src/Server.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.18.2",
+    "helmet": "^8.0.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.12.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+=======
   "name": "tttn-da21tta-lymyduyen-webquanlysanxuatbun-reactnodejs",
   "version": "1.0.0",
   "description": "webquanlysanxuatbun-reactnodejs",
@@ -36,4 +62,5 @@
     "sequelize": "^6.37.5"
   },
   "keywords": []
+>>>>>>> 4fb76d5cb6eeef137ebe5227cc8cea038becfe21
 }
