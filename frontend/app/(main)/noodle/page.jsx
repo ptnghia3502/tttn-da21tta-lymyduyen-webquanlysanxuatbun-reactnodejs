@@ -5,14 +5,11 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import NguyenLieuService from '../../../services/nguyenLieuService';
-import ThanhPhamService from '../../../services/thanhPhamService';
-import TonKhoService from '../../../services/tonKhoService';
-import NguyenLieuDialog from '../../../modal/NguyenLieuDialog';
-import ThanhPhamDialog from '../../../modal/ThanhPhamDialog';
-import TonKhoDialog from '../../../modal/TonKhoDialog';
+import NguyenLieuService from '../../services/nguyenlieuService';
+// import NguyenLieuDialog from '../../modal/nguyenlieuDialog.ts';
 
-const QuanLySanXuatBun = () => {
+
+const NguyenLieuPage = () => {
     const [dataList, setDataList] = useState([]);
     const [displayDialog, setDisplayDialog] = useState(false);
     const [isNew, setIsNew] = useState(false);
@@ -128,9 +125,9 @@ const QuanLySanXuatBun = () => {
                     </DataTable>
                 </div>
             </div>
-            <NguyenLieuDialog visible={displayDialog} onHide={() => setDisplayDialog(false)} isNew={isNew} formData={formData} onInputChange={onInputChange} onSave={saveData} />
+            {/* <NguyenLieuDialog visible={displayDialog} onHide={() => setDisplayDialog(false)} isNew={isNew} formData={formData} onInputChange={onInputChange} onSave={saveData} /> */}
         </div>
     );
 };
 
-export default QuanLySanXuatBun;
+export default NguyenLieuPage;

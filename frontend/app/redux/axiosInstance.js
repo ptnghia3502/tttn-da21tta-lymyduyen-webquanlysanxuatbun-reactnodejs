@@ -5,7 +5,7 @@ import { enqueueSnackbar } from 'notistack';
 import { useDispatch } from 'react-redux';
 import { login } from './authSlice'; // Giả định bạn có action login trong Redux
 
-const apiUrl = process.env.NEXT_PUBLIC_URL_SERVER;
+const apiUrl = process.env.URL_REACT;
 const axiosInstance = axios.create({
   baseURL: apiUrl,
   withCredentials: true // Đảm bảo gửi cookie (refresh token) trong mọi request
