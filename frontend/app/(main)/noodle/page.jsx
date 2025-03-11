@@ -6,7 +6,7 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import NguyenLieuService from '../../services/nguyenlieuService';
-// import NguyenLieuDialog from '../../modal/nguyenlieuDialog.ts';
+import NguyenLieuModal from '../../modal/NguyenLieuModal';
 
 
 const NguyenLieuPage = () => {

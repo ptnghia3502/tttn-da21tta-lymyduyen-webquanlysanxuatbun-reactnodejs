@@ -3,7 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { enqueueSnackbar } from 'notistack';
 import { useDispatch } from 'react-redux';
-import { login } from './authSlice'; // Giả định bạn có action login trong Redux
+import { login } from './authSlice.mjs'; // Giả định bạn có action login trong Redux
 
 const apiUrl = process.env.URL_REACT;
 const axiosInstance = axios.create({

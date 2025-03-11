@@ -1,0 +1,48 @@
+{
+  "name": "tttn-da21tta-lymyduyen-webquanlysanxuatbun-reactnodejs",
+  "version": "1.0.0",
+  "description": "This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).",
+  "homepage": "https://github.com/Mint234556/tttn-da21tta-lymyduyen-webquanlysanxuatbun-reactnodejs#readme",
+  "bugs": {
+    "url": "https://github.com/Mint234556/tttn-da21tta-lymyduyen-webquanlysanxuatbun-reactnodejs/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mint234556/tttn-da21tta-lymyduyen-webquanlysanxuatbun-reactnodejs.git"
+  },
+  "license": "ISC",
+  "author": "My Duyen",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cd frontend && next dev",
+    "build": "cd frontend && next build",
+    "start": "cd frontend && next start",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/material": "^6.4.7",
+    "@react-oauth/google": "^0.12.1",
+    "@reduxjs/toolkit": "^2.6.1",
+    "axios": "^1.8.2",
+    "chart.js": "^4.4.8",
+    "js-cookie": "^3.0.5",
+    "next": "^15.2.1",
+    "notistack": "^3.0.2",
+    "primeflex": "^4.0.0",
+    "primeicons": "^7.0.0",
+    "primereact": "^9.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-redux": "^9.2.0",
+    "sass": "^1.85.1"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36",
+    "@types/js-cookie": "^3.0.6",
+    "@types/node": "22.13.10",
+    "typescript": "5.8.2"
+  }
+}

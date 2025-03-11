@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie'; // Import js-cookie
 import { Provider } from 'react-redux';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import store from './redux/store';
+import store from './redux/store.mjs';
 import { SnackbarProvider } from 'notistack';
 interface RootLayoutProps {
   children: React.ReactNode;
