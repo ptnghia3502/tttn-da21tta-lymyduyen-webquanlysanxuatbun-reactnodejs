@@ -41,3 +41,4 @@ yarn-error.log*
 *.temp
 .cache
 node_modules/
+backend/node_modules/
