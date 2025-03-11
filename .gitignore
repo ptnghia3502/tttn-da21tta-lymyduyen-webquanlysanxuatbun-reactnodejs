@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-# Environment variables
 .env
 
 !.env.example
@@ -43,6 +40,4 @@ yarn-error.log*
 *.tmp
 *.temp
 .cache
-=======
 node_modules/
->>>>>>> 4fb76d5cb6eeef137ebe5227cc8cea038becfe21
