@@ -59,14 +59,31 @@ const userSchema = {
   }),
 
   update: Joi.object({
-    fullName: commonRules.fullName,
-    email: commonRules.email,
-    phone: commonRules.phone,
-    status: Joi.number()
-      .valid(0, 1)
-      .required()
+    hoTen: Joi.string()
+      .min(2)
+      .max(100)
       .messages({
-        'any.only': 'Trạng thái không hợp lệ'
+        'string.min': 'Họ tên phải có ít nhất {#limit} ký tự',
+        'string.max': 'Họ tên không được vượt quá {#limit} ký tự'
+      }),
+    email: Joi.string()
+      .email()
+      .messages({
+        'string.email': 'Email không hợp lệ'
+      }),
+    sdt: Joi.string()
+      .pattern(/^[0-9]{10,11}$/)
+      .messages({
+        'string.pattern.base': 'Số điện thoại không hợp lệ'
+      }),
+    matKhau: Joi.string()
+      .min(6)
+      .max(50)
+      .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/)
+      .messages({
+        'string.min': 'Mật khẩu phải có ít nhất {#limit} ký tự',
+        'string.max': 'Mật khẩu không được vượt quá {#limit} ký tự',
+        'string.pattern.base': 'Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt'
       })
   }),
 

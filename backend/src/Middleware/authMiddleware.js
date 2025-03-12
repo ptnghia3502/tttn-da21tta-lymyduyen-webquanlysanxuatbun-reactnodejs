@@ -32,7 +32,11 @@ const checkRole = (requiredRoles) => {
     connection.query(query, [req.userId], (err, results) => {
       if (err) {
         console.error('Database error:', err);
-        return res.status(500).json({ error: 'Database error' });
+        return res.status(500).json({ 
+          error: 'Database error',
+          message: err.message,
+          code: err.code
+        });
       }
 
       // Chuyển đổi tất cả quyền về chữ thường để so sánh

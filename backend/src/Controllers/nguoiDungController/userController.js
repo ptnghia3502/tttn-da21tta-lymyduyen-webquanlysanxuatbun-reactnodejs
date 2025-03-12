@@ -521,4 +521,82 @@ router.post('/logout', verifyToken, async (req, res) => {
   }
 });
 
-module.exports = router; 
+// Cập nhật thông tin người dùng
+const updateUser = async (req, res) => {
+  try {
+    const userId = req.userId; // Lấy từ token
+    const { hoTen, email, sdt, matKhau } = req.body;
+
+    // Kiểm tra người dùng tồn tại
+    const [user] = await query('SELECT * FROM NguoiDung WHERE Id = ?', [userId]);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy người dùng'
+      });
+    }
+
+    // Chuẩn bị dữ liệu cập nhật
+    const updateData = {
+      Ho_ten: hoTen || user.Ho_ten,
+      Email: email || user.Email,
+      SDT: sdt || user.SDT
+    };
+
+    // Nếu có cập nhật mật khẩu
+    if (matKhau) {
+      const hashedPassword = await bcrypt.hash(matKhau, 10);
+      updateData.Mat_khau = hashedPassword;
+    }
+
+    // Cập nhật thông tin
+    await query(
+      'UPDATE NguoiDung SET ? WHERE Id = ?',
+      [updateData, userId]
+    );
+
+    res.json({
+      success: true,
+      message: 'Cập nhật thông tin thành công'
+    });
+
+  } catch (error) {
+    handleError(res, error, 'Lỗi khi cập nhật thông tin người dùng');
+  }
+};
+
+// Thay đổi cách export từ router sang các hàm riêng lẻ
+const login = async (req, res) => {
+  // ... code xử lý login
+};
+
+const register = async (req, res) => {
+  // ... code xử lý register
+};
+
+const getAllUsers = async (req, res) => {
+  // ... code xử lý get all users
+};
+
+const getUserById = async (req, res) => {
+  // ... code xử lý get user by id
+};
+
+const deleteUser = async (req, res) => {
+  // ... code xử lý delete user
+};
+
+const assignRole = async (req, res) => {
+  // ... code xử lý assign role
+};
+
+// Export tất cả các hàm
+module.exports = {
+  login,
+  register,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  assignRole
+}; 
