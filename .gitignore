@@ -1,1 +1,44 @@
+.env
+
+!.env.example
+
+# Database scripts
+/src/Database/script_CSDL_old.sql
+/src/Database/Script_EDIT.sql
+
+# Dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+
+# Production
+/build
+/dist
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temporary files
+*.tmp
+*.temp
+.cache
 node_modules/
+backend/node_modules/
