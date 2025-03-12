@@ -1,7 +1,7 @@
 // src/controllers/thanhPhamController.js
 const express = require('express');
 const ThanhPham = require('../../models/thanhphamModel');
-const { verifyToken, checkRole } = require('../../middleware/authMiddleware');
+const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const router = express.Router();
 
 // Lấy danh sách thành phẩm

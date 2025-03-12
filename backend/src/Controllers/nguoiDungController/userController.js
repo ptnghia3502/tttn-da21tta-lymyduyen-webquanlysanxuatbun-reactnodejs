@@ -568,26 +568,210 @@ const updateUser = async (req, res) => {
 // Thay đổi cách export từ router sang các hàm riêng lẻ
 const login = async (req, res) => {
   // ... code xử lý login
+  try {
+    const { username, password } = req.body;
+    
+    console.log('Login attempt:', { username });
+
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Vui lòng nhập đầy đủ thông tin đăng nhập'
+      });
+    }
+
+    const userQuery = `
+      SELECT n.*, GROUP_CONCAT(q.Ten_quyen) as roles 
+      FROM NguoiDung n 
+      LEFT JOIN Quyen_NguoiDung qn ON n.Id = qn.Nguoi_dung_id 
+      LEFT JOIN Quyen q ON qn.Quyen_id = q.Id 
+      WHERE n.Ten_dang_nhap = ?
+      GROUP BY n.Id
+    `;
+
+    const users = await query(userQuery, [username]);
+    console.log('User found:', users.length > 0);
+
+    if (users.length === 0) {
+      return res.status(401).json({
+        success: false,
+        message: 'Tên đăng nhập hoặc mật khẩu không đúng'
+      });
+    }
+
+    const user = users[0];
+    const isMatch = await bcrypt.compare(password, user.Mat_khau);
+    
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: 'Tên đăng nhập hoặc mật khẩu không đúng'
+      });
+    }
+
+    if (user.Trang_thai === 0) {
+      return res.status(401).json({
+        success: false,
+        message: 'Tài khoản đã bị khóa'
+      });
+    }
+
+    const token = jwt.sign(
+      { id: user.Id },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+
+    res.json({
+      success: true,
+      data: {
+        token,
+        user: {
+          id: user.Id,
+          username: user.Ten_dang_nhap,
+          fullName: user.Ho_ten,
+          email: user.Email,
+          roles: user.roles ? user.roles.split(',') : []
+        }
+      }
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi đăng nhập');
+  }
 };
 
 const register = async (req, res) => {
   // ... code xử lý register
+  try {
+    const { username, password, fullName, email, phone } = req.body;
+
+    // Validate password format
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
+      });
+    }
+
+    // Kiểm tra username đã tồn tại
+    const existingUser = await query(
+      'SELECT Id FROM NguoiDung WHERE Ten_dang_nhap = ?',
+      [username]
+    );
+    if (existingUser.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tên đăng nhập đã tồn tại'
+      });
+    }
+
+    // Kiểm tra email đã tồn tại
+    const existingEmail = await query(
+      'SELECT Id FROM NguoiDung WHERE Email = ?',
+      [email]
+    );
+    if (existingEmail.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email đã tồn tại'
+      });
+    }
+
+    // Hash mật khẩu
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Thêm người dùng mới
+    const result = await query(
+      'INSERT INTO NguoiDung (Ten_dang_nhap, Mat_khau, Ho_ten, Email, SDT, Trang_thai) VALUES (?, ?, ?, ?, ?, 1)',
+      [username, hashedPassword, fullName, email, phone]
+    );
+
+    // Gán quyền User mặc định
+    const userRole = await query('SELECT Id FROM Quyen WHERE Ten_quyen = ?', ['User']);
+    if (userRole.length > 0) {
+      await query(
+        'INSERT INTO Quyen_NguoiDung (Nguoi_dung_id, Quyen_id) VALUES (?, ?)',
+        [result.insertId, userRole[0].Id]
+      );
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Đăng ký tài khoản thành công'
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi đăng ký tài khoản');
+  }
 };
 
 const getAllUsers = async (req, res) => {
   // ... code xử lý get all users
+  try {
+    const users = await query('SELECT * FROM NguoiDung');
+    res.json({
+      success: true,
+      data: users
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi khi lấy danh sách người dùng');
+  }
 };
 
 const getUserById = async (req, res) => {
   // ... code xử lý get user by id
+  try {
+    const { id } = req.params;
+    const user = await query('SELECT * FROM NguoiDung WHERE Id = ?', [id]);
+    if (user.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Không tìm thấy người dùng'
+      });
+    }
+    res.json({
+      success: true,
+      data: user[0]
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi khi lấy thông tin người dùng');
+  }
 };
 
 const deleteUser = async (req, res) => {
   // ... code xử lý delete user
+  try {
+    const { id } = req.params;
+    await query('DELETE FROM NguoiDung WHERE Id = ?', [id]);
+    res.json({
+      success: true,
+      message: 'Xóa người dùng thành công'
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi khi xóa người dùng');
+  }
 };
 
 const assignRole = async (req, res) => {
   // ... code xử lý assign role
+  try {
+    const { userId, roleIds } = req.body;
+    // Xóa quyền cũ
+    await query('DELETE FROM Quyen_NguoiDung WHERE Nguoi_dung_id = ?', [userId]);
+    // Thêm quyền mới
+    for (const roleId of roleIds) {
+      await query(
+        'INSERT INTO Quyen_NguoiDung (Nguoi_dung_id, Quyen_id) VALUES (?, ?)',
+        [userId, roleId]
+      );
+    }
+    res.json({
+      success: true,
+      message: 'Gán quyền thành công'
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi khi gán quyền');
+  }
 };
 
 // Export tất cả các hàm
