@@ -8,7 +8,6 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import NguyenLieuService from '../../services/nguyenlieuService';
 import NguyenLieuModal from '../../modal/NguyenLieuModal';
 
-
 const NguyenLieuPage = () => {
     const [dataList, setDataList] = useState([]);
     const [displayDialog, setDisplayDialog] = useState(false);
@@ -125,7 +124,6 @@ const NguyenLieuPage = () => {
                     </DataTable>
                 </div>
             </div>
-            {/* <NguyenLieuDialog visible={displayDialog} onHide={() => setDisplayDialog(false)} isNew={isNew} formData={formData} onInputChange={onInputChange} onSave={saveData} /> */}
         </div>
     );
 };

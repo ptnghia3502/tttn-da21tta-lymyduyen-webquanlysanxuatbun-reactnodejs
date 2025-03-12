@@ -1,7 +1,7 @@
 import axios from "axios";
 import { ThanhPham } from "../models/thanhphamModel";
 
-const API_URL = "http://localhost:3000/api/thanhpham";
+const API_URL = `${process.env.URL_REACT || "https://quanly-sanxuat-tts-vnpt.onrender.com"}/api/thanhpham`;
 
 export const ThanhPhamService = {
   async getAll() {
@@ -22,3 +22,5 @@ export const ThanhPhamService = {
     await axios.delete(`${API_URL}/${id}`);
   },
 };
+
+console.log("ThanhPham API_URL:", API_URL);

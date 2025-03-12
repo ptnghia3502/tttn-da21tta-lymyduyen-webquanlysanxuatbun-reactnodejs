@@ -14,7 +14,7 @@ interface AppLayoutProps {
 }
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const [userRole, setUserRole] = useState(null);
+  const [userRole, setUserRole] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const patchName = usePathname();
@@ -30,7 +30,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       }
 
       try {
-        const role = await verifyAdmin(accessToken, patchName);
+        const role = await verifyAdmin(accessToken);
         setUserRole(role);
       } catch (error) {
         setUserRole(null);

@@ -1,6 +1,6 @@
 import axiosInstance from '../redux/axiosInstance.mjs';
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/nguyenlieu`;
+const API_URL = `${process.env.URL_REACT || 'https://quanly-sanxuat-tts-vnpt.onrender.com'}/api/nguyenlieu`;
 
 const NguyenLieuService = {
   async getAll() {
@@ -36,5 +36,6 @@ const NguyenLieuService = {
   async delete(id) {
     await axiosInstance.delete(`${API_URL}/${id}`);
   },
-}
+};
+
 export default NguyenLieuService;

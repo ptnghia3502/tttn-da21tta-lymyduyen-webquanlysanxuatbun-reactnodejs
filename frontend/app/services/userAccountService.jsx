@@ -1,6 +1,6 @@
 import axiosInstance from "../redux/axiosInstance.mjs";
 
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/user`;
+const API_URL = `${process.env.URL_REACT || "https://quanly-sanxuat-tts-vnpt.onrender.com"}/api/user`;
 
 const UserService = {
   // Đăng nhập
@@ -70,9 +70,13 @@ const UserService = {
     return response.data.isAdmin;
   },
 };
+
+// Hàm kiểm tra quyền Admin
 export const verifyAdmin = (user) => {
-  return user?.role === 'Admin';
+  return user?.role === "Admin";
 };
 
 export default UserService;
-//aaa
+
+// Log kiểm tra
+console.log("User API_URL:", API_URL);
