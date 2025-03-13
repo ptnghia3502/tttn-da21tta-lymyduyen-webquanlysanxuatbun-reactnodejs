@@ -11,7 +11,12 @@ const connection = require('./Config/database');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  credentials: true,
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type,Authorization'
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -67,11 +72,6 @@ try {
   app.use('/api', thanhPhamRoutes);
   // Test route
   app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to Quản lý sản xuất bún API' });
-  });
-
-  // Error handling middleware
-  app.use((err, req, res, next) => {
     console.error('Error:', err);
     res.status(500).json({ error: 'Lỗi server!' });
   });
