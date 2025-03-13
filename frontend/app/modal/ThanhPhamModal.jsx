@@ -5,44 +5,61 @@ import { InputText } from "primereact/inputtext";
 
 const ThanhPhamModal = ({ visible, onHide, onSave, initialData }) => {
   const [formData, setFormData] = useState({
-    id: 0,
-    ten: "",
-    loai: "",
-    soLuong: 0,
-    ngaySanXuat: "",
+    id: null,
+    ten_thanh_pham: '',
+    don_vi_tinh: '',
+    so_luong_ton: 0,
+    gia_ban: 0,
+    ngay_san_xuat: ''
   });
 
   useEffect(() => {
     if (initialData) {
-      setFormData(initialData);
-    } else {
-      setFormData({ id: 0, ten: "", loai: "", soLuong: 0, ngaySanXuat: "" });
+      setFormData({
+        id: initialData.id || null,
+        ten_thanh_pham: initialData.ten_thanh_pham || '',
+        don_vi_tinh: initialData.don_vi_tinh || '',
+        so_luong_ton: initialData.so_luong_ton || 0,
+        gia_ban: initialData.gia_ban || 0,
+        ngay_san_xuat: initialData.ngay_san_xuat || ''
+      });
     }
   }, [initialData]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   const handleSubmit = () => {
-    onSave(formData);
-    onHide();
+    if (typeof onSave === 'function') {
+      onSave(formData);
+      onHide();
+    } else {
+      console.error("onSave is not defined or not a function");
+    }
   };
 
   return (
     <Dialog visible={visible} onHide={onHide} header="Thành phẩm" modal>
       <div className="p-fluid">
         <label>Tên</label>
-        <InputText name="ten" value={formData.ten} onChange={handleChange} />
+        <InputText name="ten_thanh_pham" value={formData.ten_thanh_pham} onChange={handleChange} />
 
-        <label>Loại</label>
-        <InputText name="loai" value={formData.loai} onChange={handleChange} />
+        <label>Đơn vị tính</label>
+        <InputText name="don_vi_tinh" value={formData.don_vi_tinh} onChange={handleChange} />
 
         <label>Số lượng</label>
-        <InputText name="soLuong" type="number" value={formData.soLuong} onChange={handleChange} />
+        <InputText name="so_luong_ton" type="number" value={formData.so_luong_ton} onChange={handleChange} />
+
+        <label>Giá</label>
+        <InputText name="gia_ban" type="number" value={formData.gia_ban} onChange={handleChange} />
 
         <label>Ngày sản xuất</label>
-        <InputText name="ngaySanXuat" type="date" value={formData.ngaySanXuat} onChange={handleChange} />
+        <InputText name="ngay_san_xuat" type="date" value={formData.ngay_san_xuat} onChange={handleChange} />
       </div>
 
       <div className="mt-3">

@@ -1,7 +1,7 @@
 import axios from "axios";
-import { ThanhPham } from "../models/thanhphamModel";
+import { ThanhPham } from "../modal/ThanhPhamModal";
 
-const API_URL = `${process.env.URL_REACT || "https://quanly-sanxuat-tts-vnpt.onrender.com"}/api/thanhpham`;
+const API_URL = `${process.env.NEXT_PUBLIC_URL_REACT}/api/thanh-pham`;
 
 export const ThanhPhamService = {
   async getAll() {
