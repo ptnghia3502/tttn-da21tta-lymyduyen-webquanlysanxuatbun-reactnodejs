@@ -5,6 +5,7 @@ require('dotenv').config();
 const nguyenVatLieuRoutes = require('./Routers/nguyenVatLieuRoutes/nguyenVatLieuRoutes');
 const userRoutes = require('./Routers/nguoiDungRouter/userRouters');
 const roleRoutes = require('./Routers/roleRouter/roleRouters');
+const thanhPhamRoutes = require('./Routers/thanhphamRoutes/thanhphamRoutes');
 const connection = require('./Config/database');
 
 const app = express();
@@ -63,6 +64,7 @@ try {
   app.use('/api', userRoutes);
   app.use('/api', nguyenVatLieuRoutes);
   app.use('/api', roleRoutes);
+  app.use('/api', thanhPhamRoutes);
   // Test route
   app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Quản lý sản xuất bún API' });
