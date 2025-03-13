@@ -7,7 +7,6 @@ import { enqueueSnackbar } from 'notistack';
 import { usePathname } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import { verifyAdmin } from '../services/userAccountService';
-import { Box, CircularProgress } from '@mui/material';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -21,11 +20,13 @@ export default function AppLayout({ children }: AppLayoutProps) {
   useEffect(() => {
     const checkUserRole = async () => {
       const accessToken = Cookies.get('accessToken');
-      if (!accessToken) {
+      if (!accessToken || accessToken === 'undefined') {
+        Cookies.remove('accessToken');
         enqueueSnackbar('Bạn không có quyền truy cập vào trang này', {
           variant: 'info'
         });
         setLoading(false);
+        router.push('/auth/login');
         return;
       }
 
@@ -41,19 +42,5 @@ export default function AppLayout({ children }: AppLayoutProps) {
     checkUserRole();
   }, []);
   console.log('patchName', patchName);
-  if (loading)
-    return (
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh'
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-
   return <Layout>{children}</Layout>;
 }

@@ -1,6 +1,6 @@
 import axiosInstance from '../redux/axiosInstance.mjs';
-
-const API_URL = `${process.env.URL_REACT || 'https://quanly-sanxuat-tts-vnpt.onrender.com'}/api/nguyenlieu`;
+debugger
+const API_URL = `${process.env.NEXT_PUBLIC_URL_REACT}/api/nguyen-vat-lieu`;
 
 const NguyenLieuService = {
   async getAll() {

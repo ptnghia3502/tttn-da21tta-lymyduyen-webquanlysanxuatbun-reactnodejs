@@ -12,10 +12,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: '*',
-  credentials: true,
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  allowedHeaders: 'Content-Type,Authorization'
+  origin: ["http://localhost:3000", "http://localhost:3001" ,"https://quanly-sanxuat-tts-vnpt.vercel.app/"],  // Cho phép tất cả domain
+  methods: ["GET", "POST", "PUT", "DELETE"],  // Chỉ cho phép các method cụ thể
+  allowedHeaders: ["Content-Type", "Authorization"], // Cho phép các header cụ thể
+  credentials: true  // Cho phép gửi cookie
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -79,7 +79,7 @@ try {
   // Handle 404
   app.use((req, res) => {
     console.log('404 Not Found:', req.method, req.url);
-    res.status(404).json({ 
+    res.status(404).json({
       error: 'Route không tồn tại',
       path: req.url,
       method: req.method
@@ -87,14 +87,14 @@ try {
   });
 
   const PORT = process.env.PORT || 3000;
-  
+
   // Thêm xử lý lỗi khi start server
   const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    
+
     // Log tất cả các routes đã đăng ký
     console.log('\nRegistered Routes:');
-    function print (path, layer) {
+    function print(path, layer) {
       if (layer.route) {
         layer.route.stack.forEach(print.bind(null, path.concat(split(layer.route.path))))
       } else if (layer.name === 'router' && layer.handle.stack) {
@@ -105,7 +105,7 @@ try {
           path.concat(split(layer.regexp)).filter(Boolean).join('/'))
       }
     }
-    function split (thing) {
+    function split(thing) {
       if (typeof thing === 'string') return thing.split('/')
       if (thing.fast_slash) return ''
       var match = thing.toString()
