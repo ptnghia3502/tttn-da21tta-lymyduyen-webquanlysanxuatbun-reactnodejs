@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const connection = require('../../Config/database');
+const connection = require('../../config/database');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const { userSchema, roleSchema, validate } = require('../../Middleware/validationMiddleware');
 const util = require('util');
@@ -20,12 +20,150 @@ const handleError = (res, error, message) => {
   });
 };
 
-// Đăng nhập
-router.post('/login', async (req, res) => {
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     User:
+ *       type: object
+ *       required:
+ *         - username
+ *         - password
+ *         - fullName
+ *         - email
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: The auto-generated id of the user
+ *         username:
+ *           type: string
+ *           description: The username
+ *         fullName:
+ *           type: string
+ *           description: The user's full name
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: The user's email
+ *         phone:
+ *           type: string
+ *           description: The user's phone number
+ *         status:
+ *           type: integer
+ *           description: User status (0 = inactive, 1 = active)
+ *         roles:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: User roles
+ *       example:
+ *         id: 1
+ *         username: admin
+ *         fullName: Administrator
+ *         email: admin@example.com
+ *         phone: "0123456789"
+ *         status: 1
+ *         roles: ["Admin"]
+ *
+ *     LoginRequest:
+ *       type: object
+ *       required:
+ *         - username
+ *         - password
+ *       properties:
+ *         username:
+ *           type: string
+ *           description: The username
+ *         password:
+ *           type: string
+ *           description: The password
+ *       example:
+ *         username: admin
+ *         password: Admin123@
+ *
+ *     RegisterRequest:
+ *       type: object
+ *       required:
+ *         - username
+ *         - password
+ *         - fullName
+ *         - email
+ *       properties:
+ *         username:
+ *           type: string
+ *           description: The username
+ *         password:
+ *           type: string
+ *           description: The password
+ *         fullName:
+ *           type: string
+ *           description: The user's full name
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: The user's email
+ *         phone:
+ *           type: string
+ *           description: The user's phone number
+ *       example:
+ *         username: newuser
+ *         password: Password123@
+ *         fullName: New User
+ *         email: newuser@example.com
+ *         phone: "0123456789"
+ */
+
+/**
+ * @swagger
+ * /users/login:
+ *   post:
+ *     summary: Login to the system
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/LoginRequest'
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     token:
+ *                       type: string
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *       401:
+ *         description: Invalid credentials
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Tên đăng nhập hoặc mật khẩu không đúng
+ */
+const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     
-    // Kiểm tra username và password
+    console.log('Login attempt:', { username });
+
     if (!username || !password) {
       return res.status(400).json({
         success: false,
@@ -43,6 +181,8 @@ router.post('/login', async (req, res) => {
     `;
 
     const users = await query(userQuery, [username]);
+    console.log('User found:', users.length > 0);
+
     if (users.length === 0) {
       return res.status(401).json({
         success: false,
@@ -52,6 +192,7 @@ router.post('/login', async (req, res) => {
 
     const user = users[0];
     const isMatch = await bcrypt.compare(password, user.Mat_khau);
+    
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -59,7 +200,6 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Kiểm tra trạng thái tài khoản
     if (user.Trang_thai === 0) {
       return res.status(401).json({
         success: false,
@@ -73,7 +213,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '24h' }
     );
 
-    res.json({ 
+    res.json({
       success: true,
       data: {
         token,
@@ -89,7 +229,282 @@ router.post('/login', async (req, res) => {
   } catch (error) {
     handleError(res, error, 'Lỗi đăng nhập');
   }
-});
+};
+
+/**
+ * @swagger
+ * /users/register:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/RegisterRequest'
+ *     responses:
+ *       201:
+ *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Đăng ký tài khoản thành công
+ *       400:
+ *         description: Invalid input or username/email already exists
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: Tên đăng nhập đã tồn tại
+ */
+const register = async (req, res) => {
+  try {
+    const { username, password, fullName, email, phone } = req.body;
+
+    // Validate password format
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
+      });
+    }
+
+    // Kiểm tra username đã tồn tại
+    const existingUser = await query(
+      'SELECT Id FROM NguoiDung WHERE Ten_dang_nhap = ?',
+      [username]
+    );
+    if (existingUser.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Tên đăng nhập đã tồn tại'
+      });
+    }
+
+    // Kiểm tra email đã tồn tại
+    const existingEmail = await query(
+      'SELECT Id FROM NguoiDung WHERE Email = ?',
+      [email]
+    );
+    if (existingEmail.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email đã tồn tại'
+      });
+    }
+
+    // Hash mật khẩu
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Thêm người dùng mới
+    const result = await query(
+      'INSERT INTO NguoiDung (Ten_dang_nhap, Mat_khau, Ho_ten, Email, SDT, Trang_thai) VALUES (?, ?, ?, ?, ?, 1)',
+      [username, hashedPassword, fullName, email, phone]
+    );
+
+    // Gán quyền User mặc định
+    const userRole = await query('SELECT Id FROM Quyen WHERE Ten_quyen = ?', ['User']);
+    if (userRole.length > 0) {
+      await query(
+        'INSERT INTO Quyen_NguoiDung (Nguoi_dung_id, Quyen_id) VALUES (?, ?)',
+        [result.insertId, userRole[0].Id]
+      );
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Đăng ký tài khoản thành công'
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi đăng ký tài khoản');
+  }
+};
+
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of items per page
+ *       - in: query
+ *         name: search
+ *         schema:
+ *           type: string
+ *         description: Search term for name, email or username
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: integer
+ *           enum: [0, 1]
+ *         description: Filter by status (0 = inactive, 1 = active)
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/User'
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                       example: 25
+ *                     totalPages:
+ *                       type: integer
+ *                       example: 3
+ *                     page:
+ *                       type: integer
+ *                       example: 1
+ *                     limit:
+ *                       type: integer
+ *                       example: 10
+ *                     hasNextPage:
+ *                       type: boolean
+ *                       example: true
+ *                     hasPrevPage:
+ *                       type: boolean
+ *                       example: false
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires Admin role
+ */
+const getAllUsers = async (req, res) => {
+  try {
+    const page = Math.max(1, parseInt(req.query.page) || 1); // Đảm bảo page >= 1
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10)); // Giới hạn limit từ 1-100
+    const offset = (page - 1) * limit;
+    const search = req.query.search || '';
+    const status = req.query.status !== undefined ? parseInt(req.query.status) : undefined;
+
+    // Xây dựng câu query cơ bản
+    let conditions = [];
+    let queryParams = [];
+
+    // Thêm điều kiện tìm kiếm
+    if (search) {
+      conditions.push('(n.Ho_ten LIKE ? OR n.Email LIKE ? OR n.Ten_dang_nhap LIKE ?)');
+      const searchPattern = `%${search}%`;
+      queryParams.push(searchPattern, searchPattern, searchPattern);
+    }
+
+    // Thêm điều kiện lọc theo trạng thái
+    if (status !== undefined) {
+      conditions.push('n.Trang_thai = ?');
+      queryParams.push(status);
+    }
+
+    // Tạo WHERE clause
+    const whereClause = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : '';
+
+    // Query đếm tổng số bản ghi
+    const countQuery = `
+      SELECT COUNT(DISTINCT n.Id) as total 
+      FROM NguoiDung n 
+      LEFT JOIN Quyen_NguoiDung qn ON n.Id = qn.Nguoi_dung_id 
+      LEFT JOIN Quyen q ON qn.Quyen_id = q.Id
+      ${whereClause}
+    `;
+
+    // Query lấy dữ liệu có phân trang
+    const dataQuery = `
+      SELECT 
+        n.Id,
+        n.Ten_dang_nhap,
+        n.Ho_ten,
+        n.Email,
+        n.SDT,
+        n.Trang_thai,
+        n.Ngay_Tao,
+        GROUP_CONCAT(DISTINCT q.Ten_quyen) as roles
+      FROM NguoiDung n 
+      LEFT JOIN Quyen_NguoiDung qn ON n.Id = qn.Nguoi_dung_id 
+      LEFT JOIN Quyen q ON qn.Quyen_id = q.Id
+      ${whereClause}
+      GROUP BY n.Id
+      ORDER BY n.Ngay_Tao DESC
+      LIMIT ? OFFSET ?
+    `;
+
+    // Thêm params cho LIMIT và OFFSET
+    const dataQueryParams = [...queryParams, limit, offset];
+
+    // Thực hiện queries
+    const [totalResult, users] = await Promise.all([
+      query(countQuery, queryParams),
+      query(dataQuery, dataQueryParams)
+    ]);
+
+    const total = totalResult[0].total;
+    const totalPages = Math.ceil(total / limit);
+
+    // Format dữ liệu trả về
+    const formattedUsers = users.map(user => ({
+      id: user.Id,
+      username: user.Ten_dang_nhap,
+      fullName: user.Ho_ten,
+      email: user.Email,
+      phone: user.SDT,
+      status: user.Trang_thai,
+      createdAt: user.Ngay_Tao,
+      roles: user.roles ? user.roles.split(',') : []
+    }));
+
+    res.json({
+      success: true,
+      data: formattedUsers,
+      pagination: {
+        total,
+        totalPages,
+        page,
+        limit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+  } catch (error) {
+    handleError(res, error, 'Lỗi khi lấy danh sách người dùng');
+  }
+};
 
 // Đăng ký tài khoản
 router.post('/register', validate(userSchema.register), async (req, res) => {
@@ -565,161 +980,7 @@ const updateUser = async (req, res) => {
   }
 };
 
-// Thay đổi cách export từ router sang các hàm riêng lẻ
-const login = async (req, res) => {
-  // ... code xử lý login
-  try {
-    const { username, password } = req.body;
-    
-    console.log('Login attempt:', { username });
-
-    if (!username || !password) {
-      return res.status(400).json({
-        success: false,
-        message: 'Vui lòng nhập đầy đủ thông tin đăng nhập'
-      });
-    }
-
-    const userQuery = `
-      SELECT n.*, GROUP_CONCAT(q.Ten_quyen) as roles 
-      FROM NguoiDung n 
-      LEFT JOIN Quyen_NguoiDung qn ON n.Id = qn.Nguoi_dung_id 
-      LEFT JOIN Quyen q ON qn.Quyen_id = q.Id 
-      WHERE n.Ten_dang_nhap = ?
-      GROUP BY n.Id
-    `;
-
-    const users = await query(userQuery, [username]);
-    console.log('User found:', users.length > 0);
-
-    if (users.length === 0) {
-      return res.status(401).json({
-        success: false,
-        message: 'Tên đăng nhập hoặc mật khẩu không đúng'
-      });
-    }
-
-    const user = users[0];
-    const isMatch = await bcrypt.compare(password, user.Mat_khau);
-    
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: 'Tên đăng nhập hoặc mật khẩu không đúng'
-      });
-    }
-
-    if (user.Trang_thai === 0) {
-      return res.status(401).json({
-        success: false,
-        message: 'Tài khoản đã bị khóa'
-      });
-    }
-
-    const token = jwt.sign(
-      { id: user.Id },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-
-    res.json({
-      success: true,
-      data: {
-        token,
-        user: {
-          id: user.Id,
-          username: user.Ten_dang_nhap,
-          fullName: user.Ho_ten,
-          email: user.Email,
-          roles: user.roles ? user.roles.split(',') : []
-        }
-      }
-    });
-  } catch (error) {
-    handleError(res, error, 'Lỗi đăng nhập');
-  }
-};
-
-const register = async (req, res) => {
-  // ... code xử lý register
-  try {
-    const { username, password, fullName, email, phone } = req.body;
-
-    // Validate password format
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-    if (!passwordRegex.test(password)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt'
-      });
-    }
-
-    // Kiểm tra username đã tồn tại
-    const existingUser = await query(
-      'SELECT Id FROM NguoiDung WHERE Ten_dang_nhap = ?',
-      [username]
-    );
-    if (existingUser.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Tên đăng nhập đã tồn tại'
-      });
-    }
-
-    // Kiểm tra email đã tồn tại
-    const existingEmail = await query(
-      'SELECT Id FROM NguoiDung WHERE Email = ?',
-      [email]
-    );
-    if (existingEmail.length > 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'Email đã tồn tại'
-      });
-    }
-
-    // Hash mật khẩu
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Thêm người dùng mới
-    const result = await query(
-      'INSERT INTO NguoiDung (Ten_dang_nhap, Mat_khau, Ho_ten, Email, SDT, Trang_thai) VALUES (?, ?, ?, ?, ?, 1)',
-      [username, hashedPassword, fullName, email, phone]
-    );
-
-    // Gán quyền User mặc định
-    const userRole = await query('SELECT Id FROM Quyen WHERE Ten_quyen = ?', ['User']);
-    if (userRole.length > 0) {
-      await query(
-        'INSERT INTO Quyen_NguoiDung (Nguoi_dung_id, Quyen_id) VALUES (?, ?)',
-        [result.insertId, userRole[0].Id]
-      );
-    }
-
-    res.status(201).json({
-      success: true,
-      message: 'Đăng ký tài khoản thành công'
-    });
-  } catch (error) {
-    handleError(res, error, 'Lỗi đăng ký tài khoản');
-  }
-};
-
-const getAllUsers = async (req, res) => {
-  // ... code xử lý get all users
-  try {
-    const users = await query('SELECT * FROM NguoiDung');
-    res.json({
-      success: true,
-      data: users
-    });
-  } catch (error) {
-    handleError(res, error, 'Lỗi khi lấy danh sách người dùng');
-  }
-};
-
 const getUserById = async (req, res) => {
-  // ... code xử lý get user by id
   try {
     const { id } = req.params;
     const user = await query('SELECT * FROM NguoiDung WHERE Id = ?', [id]);
@@ -739,7 +1000,6 @@ const getUserById = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  // ... code xử lý delete user
   try {
     const { id } = req.params;
     await query('DELETE FROM NguoiDung WHERE Id = ?', [id]);
@@ -753,7 +1013,6 @@ const deleteUser = async (req, res) => {
 };
 
 const assignRole = async (req, res) => {
-  // ... code xử lý assign role
   try {
     const { userId, roleIds } = req.body;
     // Xóa quyền cũ

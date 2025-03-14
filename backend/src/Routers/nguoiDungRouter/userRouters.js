@@ -4,6 +4,20 @@ const userController = require('../../Controllers/nguoiDungController/userContro
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const { validate, userSchema } = require('../../Middleware/validationMiddleware');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: User authentication endpoints
+ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User management endpoints
+ */
+
 // Định nghĩa các routes
 router.post('/users/login', userController.login);
 router.post('/users/register', validate(userSchema.register), userController.register);

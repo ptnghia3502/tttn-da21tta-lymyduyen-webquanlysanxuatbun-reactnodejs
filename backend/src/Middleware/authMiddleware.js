@@ -1,5 +1,15 @@
 const jwt = require('jsonwebtoken');
-const connection = require('../Config/database');
+const connection = require('../config/database');
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     bearerAuth:
+ *       type: http
+ *       scheme: bearer
+ *       bearerFormat: JWT
+ */
 
 // Middleware xác thực JWT
 const verifyToken = (req, res, next) => {

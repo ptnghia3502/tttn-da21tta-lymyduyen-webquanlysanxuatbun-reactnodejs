@@ -6,19 +6,27 @@ const nguyenVatLieuRoutes = require('./Routers/nguyenVatLieuRoutes/nguyenVatLieu
 const userRoutes = require('./Routers/nguoiDungRouter/userRouters');
 const roleRoutes = require('./Routers/roleRouter/roleRouters');
 const thanhPhamRoutes = require('./Routers/thanhphamRoutes/thanhphamRoutes');
-const connection = require('./Config/database');
+const connection = require('./config/database');
+const setupSwagger = require('./config/swagger');
+const helmet = require('helmet');
 
 const app = express();
 
+// Security middleware
+app.use(helmet());
+
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001" ,"https://quanly-sanxuat-tts-vnpt.vercel.app/"],  // Cho phép tất cả domain
-  methods: ["GET", "POST", "PUT", "DELETE"],  // Chỉ cho phép các method cụ thể
-  allowedHeaders: ["Content-Type", "Authorization"], // Cho phép các header cụ thể
-  credentials: true  // Cho phép gửi cookie
+  origin: ["http://localhost:3000", "http://localhost:3001", "https://quanly-sanxuat-tts-vnpt.vercel.app/"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Setup Swagger
+setupSwagger(app);
 
 // Thêm middleware logging
 app.use((req, res, next) => {
@@ -70,10 +78,10 @@ try {
   app.use('/api', nguyenVatLieuRoutes);
   app.use('/api', roleRoutes);
   app.use('/api', thanhPhamRoutes);
+  
   // Test route
   app.get('/', (req, res) => {
-    console.error('Error:', err);
-    res.status(500).json({ error: 'Lỗi server!' });
+    res.json({ message: 'API is running' });
   });
 
   // Handle 404
@@ -91,6 +99,7 @@ try {
   // Thêm xử lý lỗi khi start server
   const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log(`Swagger documentation available at http://localhost:${PORT}/api-docs`);
 
     // Log tất cả các routes đã đăng ký
     console.log('\nRegistered Routes:');
@@ -123,6 +132,7 @@ try {
       // Thử với port mới
       app.listen(PORT + 1, () => {
         console.log(`Server is running on port ${PORT + 1}`);
+        console.log(`Swagger documentation available at http://localhost:${PORT + 1}/api-docs`);
       });
     } else {
       console.error('Server error:', err);

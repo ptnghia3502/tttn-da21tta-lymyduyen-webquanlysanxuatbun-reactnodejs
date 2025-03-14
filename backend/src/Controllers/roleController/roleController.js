@@ -1,11 +1,175 @@
 const express = require('express');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const { roleSchema, validate } = require('../../Middleware/validationMiddleware');
-const connection = require('../../Config/database');
+const connection = require('../../config/database');
 const util = require('util');
 const query = util.promisify(connection.query).bind(connection);
 
 const router = express.Router();
+
+/**
+ * @swagger
+ * tags:
+ *   name: Roles
+ *   description: Role management endpoints
+ */
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Role:
+ *       type: object
+ *       required:
+ *         - tenQuyen
+ *       properties:
+ *         Id:
+ *           type: integer
+ *           description: The auto-generated id of the role
+ *         Ten_quyen:
+ *           type: string
+ *           description: The name of the role
+ *         Mo_ta:
+ *           type: string
+ *           description: Description of the role
+ *       example:
+ *         Id: 1
+ *         Ten_quyen: Admin
+ *         Mo_ta: Administrator role with full access
+ */
+
+/**
+ * @swagger
+ * /roles:
+ *   get:
+ *     summary: Get all roles
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of roles
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Role'
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires Admin role
+ */
+
+/**
+ * @swagger
+ * /roles:
+ *   post:
+ *     summary: Create a new role
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - tenQuyen
+ *             properties:
+ *               tenQuyen:
+ *                 type: string
+ *                 description: The name of the role
+ *               moTa:
+ *                 type: string
+ *                 description: Description of the role
+ *     responses:
+ *       201:
+ *         description: Role created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Tạo quyền thành công
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *       400:
+ *         description: Invalid input or role name already exists
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires Admin role
+ */
+
+/**
+ * @swagger
+ * /roles/{id}:
+ *   put:
+ *     summary: Update a role
+ *     tags: [Roles]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Role ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - tenQuyen
+ *             properties:
+ *               tenQuyen:
+ *                 type: string
+ *                 description: The name of the role
+ *               moTa:
+ *                 type: string
+ *                 description: Description of the role
+ *     responses:
+ *       200:
+ *         description: Role updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 message:
+ *                   type: string
+ *                   example: Cập nhật quyền thành công
+ *       400:
+ *         description: Invalid input or role name already exists
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Forbidden - requires Admin role
+ *       404:
+ *         description: Role not found
+ */
 
 // Lấy danh sách quyền
 router.get('/', verifyToken, checkRole(['Admin']), async (req, res) => {
