@@ -13,11 +13,10 @@ const NguyenLieuPage = () => {
   const [displayDialog, setDisplayDialog] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [formData, setFormData] = useState({ // phần này chưa fix nhưng chú ý lại key phù hợp với form
-    ten: '',
-    loai: '',
-    so_luong: 0,
-    don_vi: '',
-    trang_thai: ''
+    Ten_nguyen_lieu: '',
+    Don_vi_tinh: '',
+    So_luong_ton: '',
+    Gia: 0
   });
 
   const toast = useRef(null);
@@ -52,7 +51,7 @@ const NguyenLieuPage = () => {
   };
 
   const openNew = () => {
-    setFormData({ ten: '', loai: '', so_luong: 0, don_vi: '', trang_thai: '' });
+    setFormData({ Id: null, Ten_nguyen_lieu: '', Gia: 0, So_luong_ton: '', Don_vi_tinh: '' });
     setIsNew(true);
     setDisplayDialog(true);
   };
@@ -128,7 +127,6 @@ const NguyenLieuPage = () => {
             <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
             <Column field="So_luong_ton" header="Số Lượng"></Column>
             <Column field="Gia" header="Giá"></Column>
-            {/* <Column field="trang_thai" header="Trạng Thái"></Column> */}
             <Column
               body={(rowData) => (
                 <>

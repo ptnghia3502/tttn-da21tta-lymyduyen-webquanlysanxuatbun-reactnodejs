@@ -46,11 +46,11 @@ function NguyenLieuModal({ visible, onHide, onSuccess, initialData }) {
     try {
       setError('');
       // Kiểm tra tên nguyên liệu trùng
-      const exists = await NguyenLieuService.checkExists(formData.Ten_nguyen_lieu, formData.id);
-      if (exists) {
-        setError('Tên nguyên liệu đã tồn tại!');
-        return;
-      }
+      // const exists = await NguyenLieuService.checkExists(formData.Ten_nguyen_lieu, formData.id);
+      // if (exists) {
+      //   setError('Tên nguyên liệu đã tồn tại!');
+      //   return;
+      // }
 
       if (formData.id) {
         await NguyenLieuService.update(formData.id, {

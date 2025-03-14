@@ -31,9 +31,13 @@ const ThanhPhamPage = () => {
   const fetchData = async () => {
     try {
       const response = await ThanhPhamService.getAll();
-      setDataList(response.success ? (Array.isArray(response.data) ? response.data : []) : []);
+      if (response.success) {
+        setDataList(Array.isArray(response.data) ? response.data : []);
+      } else {
+        showError('Lỗi khi tải dữ liệu');
+      }
     } catch (error) {
-      showError('Lỗi khi tải dữ liệu');
+      showError('Lỗi kết nối máy chủ');
     }
   };
 
@@ -81,7 +85,7 @@ const ThanhPhamPage = () => {
       fetchData();
       showSuccess('Xóa thành công');
     } catch (error) {
-      showError('Lỗi khi xóa');
+      showError('Lỗi khi xóa dữ liệu');
     }
   };
 
@@ -114,7 +118,7 @@ const ThanhPhamPage = () => {
             initialData={formData}
             isNew={isNew}
             onHide={() => setDisplayDialog(false)}
-            onSave={saveData} // Đảm bảo đúng prop
+            onSave={saveData}
           />
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="ten_thanh_pham" header="Tên"></Column>
