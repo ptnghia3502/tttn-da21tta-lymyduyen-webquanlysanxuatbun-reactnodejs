@@ -15,11 +15,12 @@ const ThanhPhamPage = () => {
   const [formData, setFormData] = useState({
     id: null,
     ten_thanh_pham: '',
+    so_luong: 0,
     don_vi_tinh: '',
-    so_luong_ton: 0,
     ngay_san_xuat: '',
     gia_ban: 0,
-    mo_ta: ''
+    mo_ta: '',
+    cong_thuc: []
   });
 
   const toast = useRef(null);
@@ -30,12 +31,8 @@ const ThanhPhamPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await ThanhPhamService.getAll();
-      if (response.success) {
-        setDataList(Array.isArray(response.data) ? response.data : []);
-      } else {
-        showError('Lỗi khi tải dữ liệu');
-      }
+      const response = await ThanhPhamService.getAllWithFormula();
+      setDataList(Array.isArray(response) ? response : []);
     } catch (error) {
       showError('Lỗi kết nối máy chủ');
     }
@@ -53,11 +50,12 @@ const ThanhPhamPage = () => {
     setFormData({
       id: null,
       ten_thanh_pham: '',
+      so_luong: 0,
       don_vi_tinh: '',
-      so_luong_ton: 0,
       ngay_san_xuat: '',
       gia_ban: 0,
-      mo_ta: ''
+      mo_ta: '',
+      cong_thuc: []
     });
     setIsNew(true);
     setDisplayDialog(true);
@@ -74,8 +72,7 @@ const ThanhPhamPage = () => {
       message: 'Bạn có chắc chắn muốn xóa mục này không?',
       header: 'Xác nhận xóa',
       icon: 'pi pi-exclamation-triangle',
-      accept: () => deleteData(id),
-      reject: () => showError('Hủy thao tác xóa')
+      accept: () => deleteData(id)
     });
   };
 
@@ -107,6 +104,7 @@ const ThanhPhamPage = () => {
   return (
     <div className="p-grid">
       <Toast ref={toast} />
+      <ConfirmDialog />
       <div className="p-col-12">
         <div className="card">
           <h1>Quản Lý Thành Phẩm</h1>
@@ -122,9 +120,12 @@ const ThanhPhamPage = () => {
           />
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="ten_thanh_pham" header="Tên"></Column>
+            <Column field="so_luong" header="Số lượng"></Column>
             <Column field="don_vi_tinh" header="Đơn vị tính"></Column>
-            <Column field="so_luong_ton" header="Số Lượng"></Column>
+            <Column field="ngay_san_xuat" header="Ngày sản xuất"></Column>
             <Column field="gia_ban" header="Giá"></Column>
+            <Column field="mo_ta" header="Mô tả"></Column>
+            <Column field="cong_thuc" header="Công thức" body={(rowData) => rowData.cong_thuc?.join(', ')}></Column>
             <Column
               body={(rowData) => (
                 <>

@@ -51,13 +51,13 @@ router.get('/:id', verifyToken, async (req, res) => {
 // Create
 router.post('/', verifyToken, checkRole(['Admin']), async (req, res) => {
   try {
-    const exists = await NguyenVatLieu.checkExists(req.body.Ten_nguyen_lieu);
-    if (exists) {
-      return res.status(400).json({
-        success: false,
-        message: 'Tên nguyên vật liệu đã tồn tại'
-      });
-    }
+    // const exists = await NguyenVatLieu.checkExists(req.body.Ten_nguyen_lieu);
+    // if (exists) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'Tên nguyên vật liệu đã tồn tại'
+    //   });
+    // }
 
     const id = await NguyenVatLieu.create(req.body);
     res.status(201).json({
@@ -86,13 +86,13 @@ router.put('/:id', verifyToken, checkRole(['Admin']), async (req, res) => {
       });
     }
 
-    const nameExists = await NguyenVatLieu.checkExists(req.body.Ten_nguyen_lieu, req.params.id);
-    if (nameExists) {
-      return res.status(400).json({
-        success: false,
-        message: 'Tên nguyên vật liệu đã tồn tại'
-      });
-    }
+    // const nameExists = await NguyenVatLieu.checkExists(req.body.Ten_nguyen_lieu, req.params.id);
+    // if (nameExists) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'Tên nguyên vật liệu đã tồn tại'
+    //   });
+    // }
 
     await NguyenVatLieu.update(req.params.id, req.body);
     res.json({

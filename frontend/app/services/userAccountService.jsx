@@ -1,7 +1,6 @@
 import axiosInstance from "../redux/axiosInstance.mjs";
 
-const API_URL = `${process.env.URL_REACT || "https://quanly-sanxuat-tts-vnpt.onrender.com"}/api/user`;
-
+const API_URL = `${process.env.NEXT_PUBLIC_URL_REACT}/api/user`;
 const UserService = {
   // Đăng nhập
   async login(username, password) {

@@ -1,8 +1,8 @@
 import axiosInstance from '../redux/axiosInstance.mjs';
 
-const API_URL = `${process.env.NEXT_PUBLIC_URL_REACT}/api/nguyen-vat-lieu`;
+const API_URL = `/api/nguyen-vat-lieu`;
 
-const NguyenLieuService = {
+const NguyenVatLieuService = {
   async getAll() {
     const response = await axiosInstance.get(API_URL);
     return response.data;
@@ -43,12 +43,12 @@ const NguyenLieuService = {
   },
 
   // ✅ Thêm hàm kiểm tra nguyên liệu tồn tại
-  async checkExists(tenNguyenLieu, excludeId = null) {
-    const response = await axiosInstance.get(`${API_URL}/checkExists`, {
-      params: { tenNguyenLieu, excludeId }
-    });
-    return response.data.exists; // Backend cần trả về `{ exists: true/false }`
-  }
+  // async checkExists(tenNguyenLieu, excludeId = null) {
+  //   const response = await axiosInstance.get(`${API_URL}/checkExists`, {
+  //     params: { tenNguyenLieu, excludeId }
+  //   });
+  //   return response.data.exists; // Backend cần trả về `{ exists: true/false }`
+  // }
 };
 
-export default NguyenLieuService;
+export default NguyenVatLieuService;

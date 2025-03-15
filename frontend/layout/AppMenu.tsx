@@ -28,8 +28,8 @@ const AppMenu = () => {
     {
       label: 'Chức năng',
       items: [
-        { label: 'Nguyên liệu', icon: 'pi pi-th-large', to: '/nguyen-lieu' },
-        { label: 'Sản phẩm', icon: 'pi pi-box', to: '/thanh-pham' },
+        { label: 'Nguyên liệu', icon: 'pi pi-th-large', to: '/nguyen-vat-lieu' },
+        { label: 'Thành phẩm', icon: 'pi pi-box', to: '/thanh-pham' },
         { label: 'Kho', icon: 'pi pi-box', to: '/kho' },
       ]
     }

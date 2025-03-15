@@ -1,16 +1,17 @@
-'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
-import NguyenLieuService from '../services/nguyenlieuService';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import NguyenVatLieuService from '../services/nguyenvatlieuService';
 
-function NguyenLieuModal({ visible, onHide, onSuccess, initialData }) {
+function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
   const [formData, setFormData] = useState({
     id: null,
     Ten_nguyen_lieu: '',
     Don_vi_tinh: '',
-    So_luong_ton: 0, // Bổ sung lại trường này
+    So_luong_ton: 0,
     Gia: 0
   });
 
@@ -18,11 +19,12 @@ function NguyenLieuModal({ visible, onHide, onSuccess, initialData }) {
 
   useEffect(() => {
     if (initialData) {
+      console.log('Dữ liệu ban đầu:', initialData);
       setFormData({
         id: initialData.id,
         Ten_nguyen_lieu: initialData.Ten_nguyen_lieu,
         Don_vi_tinh: initialData.Don_vi_tinh,
-        So_luong_ton: initialData.So_luong_ton, // Lấy giá trị từ dữ liệu có sẵn
+        So_luong_ton: initialData.So_luong_ton,
         Gia: initialData.Gia
       });
     } else {
@@ -45,34 +47,52 @@ function NguyenLieuModal({ visible, onHide, onSuccess, initialData }) {
   const handleSubmit = async () => {
     try {
       setError('');
-      // Kiểm tra tên nguyên liệu trùng
-      // const exists = await NguyenLieuService.checkExists(formData.Ten_nguyen_lieu, formData.id);
-      // if (exists) {
-      //   setError('Tên nguyên liệu đã tồn tại!');
-      //   return;
-      // }
+      if (!formData.Ten_nguyen_lieu.trim()) {
+        setError('Tên nguyên liệu không được để trống');
+        return;
+      }
 
       if (formData.id) {
-        await NguyenLieuService.update(formData.id, {
+        await NguyenVatLieuService.update(formData.id, {
           Ten_nguyen_lieu: formData.Ten_nguyen_lieu,
           Don_vi_tinh: formData.Don_vi_tinh,
-          Gia: formData.Gia,
-          // Không cập nhật `So_luong_ton` vì API không hỗ trợ
+          Gia: Number(formData.Gia),
         });
       } else {
-        await NguyenLieuService.create({
+        await NguyenVatLieuService.create({
           Ten_nguyen_lieu: formData.Ten_nguyen_lieu,
           Don_vi_tinh: formData.Don_vi_tinh,
-          So_luong_ton: formData.So_luong_ton, // Trường này được đặt khi tạo mới
-          Gia: formData.Gia
+          So_luong_ton: Number(formData.So_luong_ton),
+          Gia: Number(formData.Gia),
         });
       }
+
       onSuccess();
       onHide();
     } catch (error) {
       console.error('Lỗi khi lưu nguyên liệu:', error);
       setError('Lỗi khi lưu nguyên liệu. Vui lòng thử lại.');
     }
+  };
+
+  const handleDelete = async () => {
+    confirmDialog({
+      message: 'Bạn có chắc chắn muốn xóa nguyên liệu này?',
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      accept: async () => {
+        try {
+          if (formData.id) {
+            await NguyenVatLieuService.delete(formData.id);
+            onSuccess();
+            onHide();
+          }
+        } catch (error) {
+          console.error('Lỗi khi xóa nguyên liệu:', error);
+          setError('Lỗi khi xóa nguyên liệu. Vui lòng thử lại.');
+        }
+      }
+    });
   };
 
   return (
@@ -86,7 +106,6 @@ function NguyenLieuModal({ visible, onHide, onSuccess, initialData }) {
 
         <label>Số lượng tồn</label>
         <InputText name="So_luong_ton" type="number" value={formData.So_luong_ton} onChange={handleChange} disabled={!!formData.id} />
-        {/* Không cho phép chỉnh sửa số lượng tồn nếu đang cập nhật */}
 
         <label>Giá</label>
         <InputText name="Gia" type="number" value={formData.Gia} onChange={handleChange} />
@@ -97,9 +116,12 @@ function NguyenLieuModal({ visible, onHide, onSuccess, initialData }) {
       <div className="mt-3">
         <Button label="Lưu" icon="pi pi-check" onClick={handleSubmit} className="p-button-success" />
         <Button label="Hủy" icon="pi pi-times" className="p-button-secondary" onClick={onHide} />
+        {formData.id && (
+          <Button label="Xóa" icon="pi pi-trash" className="p-button-danger" onClick={handleDelete} />
+        )}
       </div>
     </Dialog>
   );
 }
 
-export default NguyenLieuModal;
+export default NguyenVatLieuModal;

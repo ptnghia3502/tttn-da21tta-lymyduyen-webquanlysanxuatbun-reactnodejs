@@ -31,13 +31,13 @@ const LoginPage = () => {
   const clickLogin = async () => {
     try {
       setLoading(true);
-      const response = await axios.post<{ token: string; user: any }>(`${process.env.NEXT_PUBLIC_URL_REACT}/api/users/login`, {
+      const response = await axios.post<{ token: string; user:any }>("http://localhost:3000/api/users/login", {
         username,
         password,
       });
 
       if (response.status === 200) {
-        const { token, user } = response.data.data; 
+        const { token, user } = response.data; 
         console.log('token', response.data);
         
         dispatch(loginSuccess({ user, isAuthenticated: true, token }));

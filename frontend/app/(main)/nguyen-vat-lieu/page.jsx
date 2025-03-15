@@ -5,14 +5,15 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import NguyenLieuService from '../../services/nguyenlieuService';
-import NguyenLieuModal from '../../modal/NguyenVatLieuModal'; // CHú ý model khác với modal??
+import NguyenVatLieuService from '../../services/nguyenvatlieuService';
+import NguyenVatLieuModal from '../../modal/NguyenVatLieuModal'; // CHú ý model khác với modal??
 
-const NguyenLieuPage = () => {
+const NguyenVatLieuPage = () => {
   const [dataList, setDataList] = useState([]);
   const [displayDialog, setDisplayDialog] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [formData, setFormData] = useState({ // phần này chưa fix nhưng chú ý lại key phù hợp với form
+    id: null,
     Ten_nguyen_lieu: '',
     Don_vi_tinh: '',
     So_luong_ton: '',
@@ -27,7 +28,7 @@ const NguyenLieuPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await NguyenLieuService.getAll();
+      const response = await NguyenVatLieuService.getAll();
 
       //Fix: sửa lại reponse.data phù hợp với api trả về - phối hợp với BE
 
@@ -57,6 +58,7 @@ const NguyenLieuPage = () => {
   };
 
   const editData = (data) => {
+    console.log(data);
     setFormData({ ...data });
     setIsNew(false);
     setDisplayDialog(true);
@@ -74,7 +76,7 @@ const NguyenLieuPage = () => {
 
   const deleteData = async (id) => {
     try {
-      await NguyenLieuService.delete(id);
+      await NguyenVatLieuService.delete(id);
       fetchData();
       showSuccess('Xóa thành công');
     } catch (error) {
@@ -85,9 +87,9 @@ const NguyenLieuPage = () => {
   const saveData = async () => {
     try {
       if (isNew) {
-        await NguyenLieuService.create(formData);
+        await NguyenVatLieuService.create(formData);
       } else {
-        await NguyenLieuService.update(formData.id, formData);
+        await NguyenVatLieuService.update(formData.id, formData);
       }
       fetchData();
       setDisplayDialog(false);
@@ -110,17 +112,18 @@ const NguyenLieuPage = () => {
       <Toast ref={toast} />
       <div className="p-col-12">
         <div className="card">
-          <h1>Quản Lý Nguyên Liệu</h1>
+          <h1>Quản Lý Nguyên Vật Liệu</h1>
           <div style={{ marginBottom: '10px' }}>
             <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success" onClick={openNew} size='small' /> {/* Chú ý lại size */}
           </div>
-          <NguyenLieuModal
+          <NguyenVatLieuModal
             visible={displayDialog}
             formData={formData}
             isNew={isNew}
             onHide={() => setDisplayDialog(false)}
             onSuccess={saveData}
             onInputChange={onInputChange}
+            initialData={formData}
           />
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="Ten_nguyen_lieu" header="Tên"></Column>
@@ -142,4 +145,4 @@ const NguyenLieuPage = () => {
   );
 };
 
-export default NguyenLieuPage;
+export default NguyenVatLieuPage;
