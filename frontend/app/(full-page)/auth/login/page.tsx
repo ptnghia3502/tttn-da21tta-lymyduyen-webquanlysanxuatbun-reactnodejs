@@ -12,7 +12,7 @@ import { classNames } from 'primereact/utils';
 import Cookies from 'js-cookie';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../../redux/authSlice.mjs'; // Đổi từ .mjs thành .js
-import axios from 'axios';
+import axiosInstance from '@/app/redux/axiosInstance.mjs';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -31,13 +31,13 @@ const LoginPage = () => {
   const clickLogin = async () => {
     try {
       setLoading(true);
-      const response = await axios.post<{ token: string; user:any }>("http://localhost:3000/api/users/login", {
+      const response = await axiosInstance.post<{ token: string; user:any }>("http://localhost:3001/api/users/login", {
         username,
         password,
       });
 
       if (response.status === 200) {
-        const { token, user } = response.data; 
+        const { token, user } = response.data.data; 
         console.log('token', response.data);
         
         dispatch(loginSuccess({ user, isAuthenticated: true, token }));

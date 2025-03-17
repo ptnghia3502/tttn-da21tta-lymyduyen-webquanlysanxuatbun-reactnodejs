@@ -4,16 +4,16 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { confirmDialog } from 'primereact/confirmdialog';
 import NguyenVatLieuService from '../../services/nguyenvatlieuService';
-import NguyenVatLieuModal from '../../modal/NguyenVatLieuModal'; // CHú ý model khác với modal??
+import NguyenVatLieuModal from '../../modal/NguyenVatLieuModal'; 
 
 const NguyenVatLieuPage = () => {
   const [dataList, setDataList] = useState([]);
   const [displayDialog, setDisplayDialog] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [formData, setFormData] = useState({ // phần này chưa fix nhưng chú ý lại key phù hợp với form
-    id: null,
+    Id: null,
     Ten_nguyen_lieu: '',
     Don_vi_tinh: '',
     So_luong_ton: '',
@@ -29,19 +29,22 @@ const NguyenVatLieuPage = () => {
   const fetchData = async () => {
     try {
       const response = await NguyenVatLieuService.getAll();
-
-      //Fix: sửa lại reponse.data phù hợp với api trả về - phối hợp với BE
-
-      //Anh thấy có trả về phần pagin ở BE. Phối hợp lại có cần thiết hay không??
+      console.log("API Response:", response); // Kiểm tra dữ liệu từ API
+  
       if (response.success) {
+        console.log("Dữ liệu từ API:", response.data); // Log dữ liệu thực tế
         setDataList(Array.isArray(response.data) ? response.data : []);
       } else {
         setDataList([]);
       }
     } catch (error) {
-      showError('Lỗi khi tải dữ liệu');
+      console.error("Lỗi khi tải dữ liệu:", error);
+      showError("Lỗi khi tải dữ liệu");
     }
   };
+  useEffect(() => {
+    console.log("Danh sách sau khi setDataList:", dataList);
+  }, [dataList]);
 
   const showSuccess = (message) => {
     toast.current.show({ severity: 'success', summary: 'Thành công', detail: message, life: 3000 });
@@ -65,6 +68,7 @@ const NguyenVatLieuPage = () => {
   };
 
   const confirmDelete = (id) => {
+    console.log("ID cần xóa:", id); // Kiểm tra ID có hợp lệ không
     confirmDialog({
       message: 'Bạn có chắc chắn muốn xóa mục này không?',
       header: 'Xác nhận xóa',
@@ -72,7 +76,7 @@ const NguyenVatLieuPage = () => {
       accept: () => deleteData(id),
       reject: () => showError('Hủy thao tác xóa')
     });
-  };
+  };  
 
   const deleteData = async (id) => {
     try {
@@ -89,7 +93,7 @@ const NguyenVatLieuPage = () => {
       if (isNew) {
         await NguyenVatLieuService.create(formData);
       } else {
-        await NguyenVatLieuService.update(formData.id, formData);
+        await NguyenVatLieuService.update(formData.Id, formData);
       }
       fetchData();
       setDisplayDialog(false);
@@ -100,12 +104,12 @@ const NguyenVatLieuPage = () => {
   };
 
   const onInputChange = (e, name) => {
-    const val = (e.target && e.target.value) || '';
+    const val = name === "So_luong_ton" ? Number(e.target.value) || 0 : e.target.value;
     setFormData((prevData) => ({
       ...prevData,
       [name]: val
     }));
-  };
+  };  
 
   return (
     <div className="p-grid">
@@ -128,13 +132,15 @@ const NguyenVatLieuPage = () => {
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="Ten_nguyen_lieu" header="Tên"></Column>
             <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
-            <Column field="So_luong_ton" header="Số Lượng"></Column>
+            <Column field="So_luong_ton" header="Số Lượng" body={(rowData) => {
+            return Number(rowData.So_luong_ton) || 0; // Chuyển về số nếu có lỗi
+            }} />
             <Column field="Gia" header="Giá"></Column>
             <Column
               body={(rowData) => (
                 <>
                   <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editData(rowData)} />
-                  <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.id)} />
+                  <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
                 </>
               )}
             />

@@ -8,10 +8,10 @@ import NguyenVatLieuService from '../services/nguyenvatlieuService';
 
 function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
   const [formData, setFormData] = useState({
-    id: null,
+    Id: null,
     Ten_nguyen_lieu: '',
     Don_vi_tinh: '',
-    So_luong_ton: 0,
+    So_luong_ton: '',
     Gia: 0
   });
 
@@ -21,18 +21,18 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
     if (initialData) {
       console.log('Dữ liệu ban đầu:', initialData);
       setFormData({
-        id: initialData.id,
+        Id: initialData.Id,
         Ten_nguyen_lieu: initialData.Ten_nguyen_lieu,
         Don_vi_tinh: initialData.Don_vi_tinh,
         So_luong_ton: initialData.So_luong_ton,
-        Gia: initialData.Gia
+        Gia: initialData.Gia 
       });
     } else {
       setFormData({
-        id: null,
+        Id: null,
         Ten_nguyen_lieu: '',
         Don_vi_tinh: '',
-        So_luong_ton: 0,
+        So_luong_ton: '',
         Gia: 0
       });
     }
@@ -52,8 +52,10 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
         return;
       }
 
-      if (formData.id) {
-        await NguyenVatLieuService.update(formData.id, {
+      if (formData.Id) {
+        console.log('Cập nhật nguyên liệu:', formData);
+        await NguyenVatLieuService.update(formData.Id, {
+          So_luong_ton: Number(formData.So_luong_ton),
           Ten_nguyen_lieu: formData.Ten_nguyen_lieu,
           Don_vi_tinh: formData.Don_vi_tinh,
           Gia: Number(formData.Gia),
@@ -76,24 +78,33 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
   };
 
   const handleDelete = async () => {
+    console.log("Dữ liệu cần xóa:", formData); 
     confirmDialog({
       message: 'Bạn có chắc chắn muốn xóa nguyên liệu này?',
       header: 'Xác nhận xóa',
       icon: 'pi pi-exclamation-triangle',
       accept: async () => {
         try {
-          if (formData.id) {
-            await NguyenVatLieuService.delete(formData.id);
+          if (formData.Id) {
+            await NguyenVatLieuService.delete(formData.Id);
+            showSuccess("Xóa thành công!");
+            
+            // Cập nhật danh sách nguyên liệu sau khi xóa
+            setDataList(prevList => prevList.filter(item => item.Id !== formData.Id));
+            
             onSuccess();
             onHide();
+          } else {
+            console.warn("ID không hợp lệ!");
           }
         } catch (error) {
-          console.error('Lỗi khi xóa nguyên liệu:', error);
-          setError('Lỗi khi xóa nguyên liệu. Vui lòng thử lại.');
+          console.error("Lỗi khi xóa nguyên liệu:", error.response?.data || error.message);
+          setError("Lỗi khi xóa nguyên liệu. Vui lòng thử lại.");
         }
       }
     });
   };
+  
 
   return (
     <Dialog visible={visible} onHide={onHide} header="Nguyên liệu" modal>
@@ -116,7 +127,7 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
       <div className="mt-3">
         <Button label="Lưu" icon="pi pi-check" onClick={handleSubmit} className="p-button-success" />
         <Button label="Hủy" icon="pi pi-times" className="p-button-secondary" onClick={onHide} />
-        {formData.id && (
+        {formData.Id && (
           <Button label="Xóa" icon="pi pi-trash" className="p-button-danger" onClick={handleDelete} />
         )}
       </div>
