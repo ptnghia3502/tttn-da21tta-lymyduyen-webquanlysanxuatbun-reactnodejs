@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
@@ -78,7 +77,6 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
   };
 
   const handleDelete = async () => {
-    console.log("Dữ liệu cần xóa:", formData); 
     confirmDialog({
       message: 'Bạn có chắc chắn muốn xóa nguyên liệu này?',
       header: 'Xác nhận xóa',
@@ -87,12 +85,7 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
         try {
           if (formData.Id) {
             await NguyenVatLieuService.delete(formData.Id);
-            showSuccess("Xóa thành công!");
-            
-            // Cập nhật danh sách nguyên liệu sau khi xóa
-            setDataList(prevList => prevList.filter(item => item.Id !== formData.Id));
-            
-            onSuccess();
+            onSuccess();  // Gọi lại hàm cập nhật danh sách từ component cha
             onHide();
           } else {
             console.warn("ID không hợp lệ!");
@@ -104,7 +97,6 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
       }
     });
   };
-  
 
   return (
     <Dialog visible={visible} onHide={onHide} header="Nguyên liệu" modal>

@@ -12,15 +12,13 @@ const NguyenVatLieuService = {
     const response = await axiosInstance.get(`${API_URL}/${id}`);
     return response.data;
   },
-
+ 
   async create(data) {
     const payload = {
       Ten_nguyen_lieu: data.Ten_nguyen_lieu,
-      Mo_ta: data.Mo_ta,
       Don_vi_tinh: data.Don_vi_tinh,
       So_luong_ton: data.So_luong_ton,
       Gia: data.Gia,
-      Trang_thai: data.Trang_thai,
     };
     console.log('Dữ liệu gửi lên:', payload);
     await axiosInstance.post(API_URL, payload);
@@ -29,11 +27,9 @@ const NguyenVatLieuService = {
   async update(id, data) {
     const payload = {
       Ten_nguyen_lieu: data.Ten_nguyen_lieu,
-      Mo_ta: data.Mo_ta,
       Don_vi_tinh: data.Don_vi_tinh,
       So_luong_ton: data.So_luong_ton,
       Gia: data.Gia,
-      Trang_thai: data.Trang_thai,
     };
     await axiosInstance.put(`${API_URL}/${id}`, payload);
   },

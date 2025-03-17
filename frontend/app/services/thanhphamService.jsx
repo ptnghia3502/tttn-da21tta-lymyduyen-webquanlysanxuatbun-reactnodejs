@@ -17,11 +17,9 @@ const ThanhPhamService = {
     const payload = {
       ten_thanh_pham: data.ten_thanh_pham,
       mo_ta: data.mo_ta,
+      gia_ban: data.gia_ban,
       don_vi_tinh: data.don_vi_tinh,
       so_luong_ton: data.so_luong_ton,
-      gia_ban: data.gia_ban,
-      ngay_san_xuat: data.ngay_san_xuat,
-      trang_thai: data.trang_thai,
     };
     console.log('Dữ liệu gửi lên:', payload);
     await axiosInstance.post(API_URL, payload);
@@ -31,11 +29,9 @@ const ThanhPhamService = {
     const payload = {
       ten_thanh_pham: data.ten_thanh_pham,
       mo_ta: data.mo_ta,
+      gia_ban: data.gia_ban,
       don_vi_tinh: data.don_vi_tinh,
       so_luong_ton: data.so_luong_ton,
-      gia_ban: data.gia_ban,
-      ngay_san_xuat: data.ngay_san_xuat,
-      trang_thai: data.trang_thai,
     };
     await axiosInstance.put(`${API_URL}/${id}`, payload);
   },

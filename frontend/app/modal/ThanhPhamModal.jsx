@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
+import { Message } from 'primereact/message';
 import ThanhPhamService from '../services/thanhphamService';
 
 function ThanhPhamModal({ visible, onHide, onSuccess, initialData }) {
   const [formData, setFormData] = useState({
-    id: null,
+    Id: null,
     ten_thanh_pham: '',
+    mo_ta: '', 
+    gia_ban: 0,
     don_vi_tinh: '',
     so_luong_ton: 0,
-    gia_ban: 0,
-    ngay_san_xuat: '',
-    cong_thuc: ''
   });
 
   const [error, setError] = useState('');
@@ -20,23 +20,21 @@ function ThanhPhamModal({ visible, onHide, onSuccess, initialData }) {
   useEffect(() => {
     if (initialData) {
       setFormData({
-        id: initialData.id,
+        Id: initialData.Id,
         ten_thanh_pham: initialData.ten_thanh_pham,
+        mo_ta: initialData.mo_ta,
+        gia_ban: initialData.gia_ban,
         don_vi_tinh: initialData.don_vi_tinh,
         so_luong_ton: initialData.so_luong_ton,
-        gia_ban: initialData.gia_ban,
-        ngay_san_xuat: initialData.ngay_san_xuat,
-        cong_thuc: initialData.cong_thuc || ''
       });
     } else {
       setFormData({
-        id: null,
+        Id: null,
         ten_thanh_pham: '',
+        mo_ta: '',
+        gia_ban: 0,
         don_vi_tinh: '',
         so_luong_ton: 0,
-        gia_ban: 0,
-        ngay_san_xuat: '',
-        cong_thuc: ''
       });
     }
     setError('');
@@ -44,38 +42,45 @@ function ThanhPhamModal({ visible, onHide, onSuccess, initialData }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [name]: name === "gia_ban" || name === "so_luong_ton" ? Number(value) || 0 : value
+    }));
   };
 
   const handleSubmit = async () => {
+    setError('');
+
+    // Kiểm tra dữ liệu hợp lệ
+    if (!formData.ten_thanh_pham.trim()) {
+      setError('Tên thành phẩm không được để trống!');
+      return;
+    }
+    if (!formData.don_vi_tinh.trim()) {
+      setError('Đơn vị tính không được để trống!');
+      return;
+    }
+    if (formData.gia_ban < 0) {
+      setError('Giá bán không thể nhỏ hơn 0!');
+      return;
+    }
+    if (formData.so_luong_ton < 0) {
+      setError('Số lượng tồn không thể nhỏ hơn 0!');
+      return;
+    }
+
     try {
-      setError('');
-      if (!formData.ten_thanh_pham) {
-        setError('Tên thành phẩm không được để trống!');
-        return;
-      }
-      if (formData.id) {
-        await ThanhPhamService.update(formData.id, {
-          ten_thanh_pham: formData.ten_thanh_pham,
-          don_vi_tinh: formData.don_vi_tinh,
-          gia_ban: Number(formData.gia_ban),
-          ngay_san_xuat: formData.ngay_san_xuat,
-          cong_thuc: formData.cong_thuc
-        });
+      console.log("Dữ liệu gửi đi:", formData); // Debug dữ liệu gửi đi
+
+      if (formData.Id) {
+        await ThanhPhamService.update(formData.Id, formData);
       } else {
-        await ThanhPhamService.create({
-          ten_thanh_pham: formData.ten_thanh_pham,
-          don_vi_tinh: formData.don_vi_tinh,
-          so_luong_ton: Number(formData.so_luong_ton),
-          gia_ban: Number(formData.gia_ban),
-          ngay_san_xuat: formData.ngay_san_xuat,
-          cong_thuc: formData.cong_thuc
-        });
+        await ThanhPhamService.create(formData);
       }
       onSuccess();
       onHide();
     } catch (error) {
-      console.error('Lỗi khi lưu thành phẩm:', error);
+      console.error('Lỗi khi lưu thành phẩm:', error.response?.data || error.message);
       setError('Lỗi khi lưu thành phẩm. Vui lòng thử lại.');
     }
   };
@@ -86,22 +91,25 @@ function ThanhPhamModal({ visible, onHide, onSuccess, initialData }) {
         <label>Tên thành phẩm</label>
         <InputText name="ten_thanh_pham" value={formData.ten_thanh_pham} onChange={handleChange} />
 
-        <label>Đơn vị tính</label>
-        <InputText name="don_vi_tinh" value={formData.don_vi_tinh} onChange={handleChange} />
-
-        <label>Số lượng tồn</label>
-        <InputText name="so_luong_ton" type="number" value={formData.so_luong_ton} onChange={handleChange} disabled={!!formData.id} />
+        <label>Mô tả</label>
+        <InputText name="mo_ta" type="text" value={formData.mo_ta} onChange={handleChange} />
 
         <label>Giá bán</label>
         <InputText name="gia_ban" type="number" value={formData.gia_ban} onChange={handleChange} />
 
-        <label>Ngày sản xuất</label>
-        <InputText name="ngay_san_xuat" type="date" value={formData.ngay_san_xuat} onChange={handleChange} />
+        <label>Đơn vị tính</label>
+        <InputText name="don_vi_tinh" value={formData.don_vi_tinh} onChange={handleChange} />
 
-        <label>Công thức</label>
-        <InputText name="cong_thuc" value={formData.cong_thuc} onChange={handleChange} />
+        <label>Số lượng tồn</label>
+        <InputText
+          name="so_luong_ton"
+          type="number"
+          value={formData.so_luong_ton}
+          onChange={handleChange}
+          disabled={!!formData.Id}
+        />
 
-        {error && <small className="p-error">{error}</small>}
+        {error && <Message severity="error" text={error} />}
       </div>
 
       <div className="mt-3">

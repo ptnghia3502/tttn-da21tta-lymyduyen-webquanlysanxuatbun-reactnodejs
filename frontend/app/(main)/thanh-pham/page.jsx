@@ -6,21 +6,18 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import ThanhPhamService from '../../services/thanhphamService';
-import ThanhPhamModal from '../../modal/ThanhPhamModal';
+import ThanhPhamModal from '../../modal/ThanhPhamModal'; 
 
 const ThanhPhamPage = () => {
   const [dataList, setDataList] = useState([]);
   const [displayDialog, setDisplayDialog] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [formData, setFormData] = useState({
-    id: null,
-    ten_thanh_pham: '',
-    so_luong: 0,
-    don_vi_tinh: '',
-    ngay_san_xuat: '',
-    gia_ban: 0,
-    mo_ta: '',
-    cong_thuc: []
+    Id: null,
+    Ten_thanh_pham: '',
+    Don_vi_tinh: '',
+    So_luong_ton: '',
+    Gia_ban: 0
   });
 
   const toast = useRef(null);
@@ -31,10 +28,18 @@ const ThanhPhamPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await ThanhPhamService.getAllWithFormula();
-      setDataList(Array.isArray(response) ? response : []);
+      const response = await ThanhPhamService.getAll();
+      console.log("API Response:", response);
+  
+      if (response.success) {
+        console.log("Dữ liệu từ API:", response.data);
+        setDataList(Array.isArray(response.data) ? response.data : []);
+      } else {
+        setDataList([]);
+      }
     } catch (error) {
-      showError('Lỗi kết nối máy chủ');
+      console.error("Lỗi khi tải dữ liệu:", error);
+      showError("Lỗi khi tải dữ liệu");
     }
   };
 
@@ -47,32 +52,26 @@ const ThanhPhamPage = () => {
   };
 
   const openNew = () => {
-    setFormData({
-      id: null,
-      ten_thanh_pham: '',
-      so_luong: 0,
-      don_vi_tinh: '',
-      ngay_san_xuat: '',
-      gia_ban: 0,
-      mo_ta: '',
-      cong_thuc: []
-    });
+    setFormData({ Id: null, Ten_thanh_pham: '', Gia_ban: 0, So_luong_ton: '', Don_vi_tinh: '' });
     setIsNew(true);
     setDisplayDialog(true);
   };
 
   const editData = (data) => {
+    console.log(data);
     setFormData({ ...data });
     setIsNew(false);
     setDisplayDialog(true);
   };
 
   const confirmDelete = (id) => {
+    console.log("ID cần xóa:", id);
     confirmDialog({
       message: 'Bạn có chắc chắn muốn xóa mục này không?',
       header: 'Xác nhận xóa',
       icon: 'pi pi-exclamation-triangle',
-      accept: () => deleteData(id)
+      accept: () => deleteData(id),
+      reject: () => showError('Hủy thao tác xóa')
     });
   };
 
@@ -82,16 +81,16 @@ const ThanhPhamPage = () => {
       fetchData();
       showSuccess('Xóa thành công');
     } catch (error) {
-      showError('Lỗi khi xóa dữ liệu');
+      showError('Lỗi khi xóa');
     }
   };
 
-  const saveData = async (formData) => {
+  const saveData = async () => {
     try {
       if (isNew) {
         await ThanhPhamService.create(formData);
       } else {
-        await ThanhPhamService.update(formData.id, formData);
+        await ThanhPhamService.update(formData.Id, formData);
       }
       fetchData();
       setDisplayDialog(false);
@@ -100,6 +99,14 @@ const ThanhPhamPage = () => {
       showError(isNew ? 'Lỗi khi thêm mới' : 'Lỗi khi cập nhật');
     }
   };
+
+  const onInputChange = (e, name) => {
+    const val = name === "So_luong_ton" ? Number(e.target.value) || 0 : e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: val
+    }));
+  };  
 
   return (
     <div className="p-grid">
@@ -113,24 +120,25 @@ const ThanhPhamPage = () => {
           </div>
           <ThanhPhamModal
             visible={displayDialog}
-            initialData={formData}
+            formData={formData}
             isNew={isNew}
             onHide={() => setDisplayDialog(false)}
-            onSave={saveData}
+            onSuccess={saveData}
+            onInputChange={onInputChange}
+            initialData={formData}
           />
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
-            <Column field="ten_thanh_pham" header="Tên"></Column>
-            <Column field="so_luong" header="Số lượng"></Column>
-            <Column field="don_vi_tinh" header="Đơn vị tính"></Column>
-            <Column field="ngay_san_xuat" header="Ngày sản xuất"></Column>
-            <Column field="gia_ban" header="Giá"></Column>
-            <Column field="mo_ta" header="Mô tả"></Column>
-            <Column field="cong_thuc" header="Công thức" body={(rowData) => rowData.cong_thuc?.join(', ')}></Column>
+            <Column field="Ten_thanh_pham" header="Tên"></Column>
+            <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
+            <Column field="So_luong_ton" header="Số Lượng" body={(rowData) => {
+              return Number(rowData.So_luong_ton) || 0;
+            }} />
+            <Column field="Gia_ban" header="Giá Bán"></Column>
             <Column
               body={(rowData) => (
                 <>
                   <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editData(rowData)} />
-                  <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.id)} />
+                  <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
                 </>
               )}
             />
