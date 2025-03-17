@@ -4,7 +4,7 @@ import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
-import { confirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import NguyenVatLieuService from '../../services/nguyenvatlieuService';
 import NguyenVatLieuModal from '../../modal/NguyenVatLieuModal'; 
 
@@ -67,16 +67,17 @@ const NguyenVatLieuPage = () => {
     setDisplayDialog(true);
   };
 
-  const confirmDelete = (id) => {
-    console.log("ID cần xóa:", id); // Kiểm tra ID có hợp lệ không
-    confirmDialog({
-      message: 'Bạn có chắc chắn muốn xóa mục này không?',
-      header: 'Xác nhận xóa',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => deleteData(id),
-      reject: () => showError('Hủy thao tác xóa')
-    });
-  };  
+ const confirmDelete = (id) => {
+  console.log("ID cần xóa:", id); // Kiểm tra ID có hợp lệ không
+  confirmDialog({
+    message: 'Bạn có chắc chắn muốn xóa mục này không?',
+    header: 'Xác nhận xóa',
+    icon: 'pi pi-exclamation-triangle',
+    accept: () => deleteData(id),
+    reject: () => showError('Hủy thao tác xóa')
+  });
+};
+
 
   const deleteData = async (id) => {
     try {
@@ -114,6 +115,7 @@ const NguyenVatLieuPage = () => {
   return (
     <div className="p-grid">
       <Toast ref={toast} />
+      <ConfirmDialog />
       <div className="p-col-12">
         <div className="card">
           <h1>Quản Lý Nguyên Vật Liệu</h1>

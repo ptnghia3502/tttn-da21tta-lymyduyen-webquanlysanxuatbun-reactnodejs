@@ -43,12 +43,12 @@ const NguyenVatLieuService = {
   },
 
   //✅ Thêm hàm kiểm tra nguyên liệu tồn tại
-  async checkExists(tenNguyenLieu, excludeId = null) {
-    const response = await axiosInstance.get(`${API_URL}/checkExists`, {
-      params: { tenNguyenLieu, excludeId }
-    });
-    return response.data.exists; // Backend cần trả về `{ exists: true/false }`
-  }
-};
+//   async checkExists(tenNguyenLieu, excludeId = null) {
+//     const response = await axiosInstance.get(`${API_URL}/checkExists`, {
+//       params: { tenNguyenLieu, excludeId }
+//     });
+//     return response.data.exists; // Backend cần trả về `{ exists: true/false }`
+//   }
+ };
 
 export default NguyenVatLieuService;
