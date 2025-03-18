@@ -1,7 +1,7 @@
 import axios from "axios";
-import { TonKho } from "../models/tonkhoModel";
+import { TonKho } from "../modal/TonKhoModal";
 
-const API_URL = "http://localhost:3000/api/tonkho";
+const API_URL = `${process.env.URL_REACT || "https://quanly-sanxuat-tts-vnpt.onrender.com"}/api/tonkho`;
 
 export const TonKhoService = {
   async getAll() {
@@ -22,3 +22,5 @@ export const TonKhoService = {
     await axios.delete(`${API_URL}/${id}`);
   },
 };
+
+console.log("TonKho API_URL:", API_URL);

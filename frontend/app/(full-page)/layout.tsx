@@ -7,7 +7,7 @@ interface SimpleLayoutProps {
 }
 
 export const metadata: Metadata = {
-  title: 'Quản lý sản xuất bún || Hệ thống quản lý',
+  title: 'Quản lý sản xuất || Hệ thống quản lý',
   description: 'The ultimate collection of design-agnostic, flexible and accessible React UI Components.'
 };
 

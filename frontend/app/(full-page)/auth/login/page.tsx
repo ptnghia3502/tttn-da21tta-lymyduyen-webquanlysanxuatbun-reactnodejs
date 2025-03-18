@@ -11,14 +11,11 @@ import { LayoutContext } from '../../../../layout/context/layoutcontext';
 import { classNames } from 'primereact/utils';
 import Cookies from 'js-cookie';
 import { useDispatch } from 'react-redux';
-import { loginSuccess } from '../../../redux/authSlice'; //sửa chỗ import này
-import axios from 'axios';
-
-//const axiosInstance = axios.create(); // form đăng nhập này chắc k cần axios instance đâu, tại vì chưa có accessToken, này l
-const BASE_URL = process.env.NEXT_PUBLIC_URL_SERVER;
+import { loginSuccess } from '../../../redux/authSlice.mjs'; // Đổi từ .mjs thành .js
+import axiosInstance from '@/app/redux/axiosInstance.mjs';
 
 const LoginPage = () => {
-  const [username, setusername] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [checked, setChecked] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -26,43 +23,33 @@ const LoginPage = () => {
   const router = useRouter();
   const dispatch = useDispatch();
   const token = Cookies.get('accessToken');
+
   useEffect(() => {
-    // Kiểm tra xem đã đăng nhập chưa
-    if (token) {
-      router.push('/');
-    }
-  }, [router, token]); // Chạy 1 lần khi component mount
+    if (token) router.push('/');
+  }, [token]);
+
   const clickLogin = async () => {
     try {
       setLoading(true);
-      const response = await axios.post(`https://quanly-sanxuat-tts-vnpt.onrender.com/api/users/login`, {
+      const response = await axiosInstance.post<{ token: string; user:any }>("http://localhost:3001/api/users/login", {
         username,
         password,
       });
 
       if (response.status === 200) {
-        const { token, user } = response.data.data;
+        const { token, user } = response.data.data; 
         console.log('token', response.data);
         
-        // Lưu vào Redux
         dispatch(loginSuccess({ user, isAuthenticated: true, token }));
-
-        // Lưu token vào Cookie (để tránh mất khi reload trang)
-        Cookies.set('accessToken', token, { expires: 7 });// tam đóng
-        // localStorage.setItem('token', token);
-
-        // Chuyển hướng sau khi đăng nhập
+        Cookies.set('accessToken', token, { expires: 7 });
         router.push('/');
       } else {
         alert('Đăng nhập thất bại');
       }
     } catch (error) {
       console.error('Login failed:', error);
-      if (error instanceof Error) {
-        alert(error.message);
-      } else {
-        alert('An unknown error occurred');
-      }
+      const errorMessage = (error as any).response?.data?.message || 'Đăng nhập thất bại, vui lòng thử lại!';
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -79,12 +66,12 @@ const LoginPage = () => {
         <div style={{ borderRadius: '56px', padding: '0.3rem', background: 'linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)' }}>
           <div className="w-full surface-card py-8 px-5 sm:px-8" style={{ borderRadius: '53px' }}>
             <div className="text-center mb-5">
-              <div className="text-900 text-3xl font-medium mb-3">Chào mừng, Hệ Thống Quản Lý Sản Xuất Bún</div>
+              <div className="text-900 text-3xl font-medium mb-3">Chào mừng, Hệ Thống Quản Lý Sản Xuất </div>
             </div>
 
             <div>
-              <label htmlFor="username1" className="block text-900 text-xl font-medium mb-2">username</label>
-              <InputText id="username1" type="text" placeholder="Username" value={username} onChange={(e) => setusername(e.target.value)} className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} />
+              <label htmlFor="username1" className="block text-900 text-xl font-medium mb-2">Username</label>
+              <InputText id="username1" type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} className="w-full md:w-30rem mb-5" style={{ padding: '1rem' }} />
 
               <label htmlFor="password1" className="block text-900 font-medium text-xl mb-2">Mật khẩu</label>
               <Password inputId="password1" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Mật khẩu" toggleMask className="w-full mb-5" inputClassName="w-full p-3 md:w-30rem" />
@@ -99,7 +86,13 @@ const LoginPage = () => {
                 </a>
               </div>
 
-              <Button label="Đăng nhập" onClick={clickLogin} className="w-full p-3 text-xl mb-3" disabled={loading} icon={loading ? 'pi pi-spin pi-spinner' : undefined} />
+              <Button 
+                label={loading ? "Đang đăng nhập..." : "Đăng nhập"} 
+                onClick={clickLogin} 
+                className="w-full p-3 text-xl mb-3" 
+                disabled={loading} 
+                icon={loading ? 'pi pi-spin pi-spinner' : 'pi pi-sign-in'}
+              />
             </div>
           </div>
         </div>

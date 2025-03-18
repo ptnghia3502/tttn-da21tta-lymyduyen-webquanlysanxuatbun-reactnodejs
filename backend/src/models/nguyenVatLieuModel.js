@@ -1,4 +1,4 @@
-const connection = require('../Config/database');
+const connection = require('../config/database');
 const util = require('util');
 const query = util.promisify(connection.query).bind(connection);
 

@@ -5,14 +5,28 @@ require('dotenv').config();
 const nguyenVatLieuRoutes = require('./Routers/nguyenVatLieuRoutes/nguyenVatLieuRoutes');
 const userRoutes = require('./Routers/nguoiDungRouter/userRouters');
 const roleRoutes = require('./Routers/roleRouter/roleRouters');
-const connection = require('./Config/database');
+const thanhPhamRoutes = require('./Routers/thanhphamRoutes/thanhphamRoutes');
+const connection = require('./config/database');
+const setupSwagger = require('./config/swagger');
+const helmet = require('helmet');
 
 const app = express();
 
+// Security middleware
+app.use(helmet());
+
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:3000", "http://localhost:3001", "https://quanly-sanxuat-tts-vnpt.vercel.app/"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// Setup Swagger
+setupSwagger(app);
 
 // Thêm middleware logging
 app.use((req, res, next) => {
@@ -63,36 +77,33 @@ try {
   app.use('/api', userRoutes);
   app.use('/api', nguyenVatLieuRoutes);
   app.use('/api', roleRoutes);
+  app.use('/api', thanhPhamRoutes);
+  
   // Test route
   app.get('/', (req, res) => {
-    res.json({ message: 'Welcome to Quản lý sản xuất bún API' });
-  });
-
-  // Error handling middleware
-  app.use((err, req, res, next) => {
-    console.error('Error:', err);
-    res.status(500).json({ error: 'Lỗi server!' });
+    res.json({ message: 'API is running' });
   });
 
   // Handle 404
   app.use((req, res) => {
     console.log('404 Not Found:', req.method, req.url);
-    res.status(404).json({ 
+    res.status(404).json({
       error: 'Route không tồn tại',
       path: req.url,
       method: req.method
     });
   });
 
-  const PORT = process.env.PORT || 3000;
-  
+  const PORT = process.env.PORT || 3001;
+
   // Thêm xử lý lỗi khi start server
   const server = app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    
+    console.log(`Swagger documentation available at http://localhost:${PORT}/api-docs`);
+
     // Log tất cả các routes đã đăng ký
     console.log('\nRegistered Routes:');
-    function print (path, layer) {
+    function print(path, layer) {
       if (layer.route) {
         layer.route.stack.forEach(print.bind(null, path.concat(split(layer.route.path))))
       } else if (layer.name === 'router' && layer.handle.stack) {
@@ -103,7 +114,7 @@ try {
           path.concat(split(layer.regexp)).filter(Boolean).join('/'))
       }
     }
-    function split (thing) {
+    function split(thing) {
       if (typeof thing === 'string') return thing.split('/')
       if (thing.fast_slash) return ''
       var match = thing.toString()
@@ -121,6 +132,7 @@ try {
       // Thử với port mới
       app.listen(PORT + 1, () => {
         console.log(`Server is running on port ${PORT + 1}`);
+        console.log(`Swagger documentation available at http://localhost:${PORT + 1}/api-docs`);
       });
     } else {
       console.error('Server error:', err);
