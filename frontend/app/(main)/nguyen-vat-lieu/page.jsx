@@ -16,7 +16,7 @@ const NguyenVatLieuPage = () => {
     Id: null,
     Ten_nguyen_lieu: '',
     Don_vi_tinh: '',
-    So_luong_ton: '',
+    // So_luong_ton: '',
     Gia: 0
   });
 
@@ -91,11 +91,12 @@ const NguyenVatLieuPage = () => {
 
   const saveData = async () => {
     try {
-      if (isNew) {
-        await NguyenVatLieuService.create(formData);
-      } else {
-        await NguyenVatLieuService.update(formData.Id, formData);
-      }
+      // Save data ở bên modal rồi không cần save ở đây nữa
+      // if (isNew) {
+      //   await NguyenVatLieuService.create(formData);
+      // } else {
+      //   await NguyenVatLieuService.update(formData.Id, formData);
+      // }
       fetchData();
       setDisplayDialog(false);
       showSuccess(isNew ? 'Thêm mới thành công' : 'Cập nhật thành công');
@@ -134,15 +135,15 @@ const NguyenVatLieuPage = () => {
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="Ten_nguyen_lieu" header="Tên"></Column>
             <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
-            <Column field="So_luong_ton" header="Số Lượng" body={(rowData) => {
+            {/* <Column field="So_luong_ton" header="Số Lượng" body={(rowData) => {
             return Number(rowData.So_luong_ton) || 0; // Chuyển về số nếu có lỗi
-            }} />
+            }} /> */}
             <Column field="Gia" header="Giá"></Column>
             <Column
               body={(rowData) => (
                 <>
-                  <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editData(rowData)} />
-                  <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
+                  <Button size="small" icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editData(rowData)} />
+                  <Button size="small"  icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
                 </>
               )}
             />

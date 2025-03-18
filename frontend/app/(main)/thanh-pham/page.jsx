@@ -87,11 +87,11 @@ const ThanhPhamPage = () => {
 
   const saveData = async () => {
     try {
-      if (isNew) {
-        await ThanhPhamService.create(formData);
-      } else {
-        await ThanhPhamService.update(formData.Id, formData);
-      }
+      // if (isNew) {
+      //   await ThanhPhamService.create(formData);
+      // } else {
+      //   await ThanhPhamService.update(formData.Id, formData);
+      // }
       fetchData();
       setDisplayDialog(false);
       showSuccess(isNew ? 'Thêm mới thành công' : 'Cập nhật thành công');
@@ -137,8 +137,8 @@ const ThanhPhamPage = () => {
             <Column
               body={(rowData) => (
                 <>
-                  <Button icon="pi pi-pencil" className="p-button-rounded p-button-success p-mr-2" onClick={() => editData(rowData)} />
-                  <Button icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
+                  <Button size='small'  icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editData(rowData)} />
+                  <Button size='small'  icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
                 </>
               )}
             />

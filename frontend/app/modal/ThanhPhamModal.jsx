@@ -8,11 +8,11 @@ import ThanhPhamService from '../services/thanhphamService';
 function ThanhPhamModal({ visible, onHide, onSuccess, initialData }) {
   const [formData, setFormData] = useState({
     Id: null,
-    ten_thanh_pham: '',
-    mo_ta: '', 
-    gia_ban: 0,
-    don_vi_tinh: '',
-    so_luong_ton: 0,
+    Ten_thanh_pham: '',
+    Mo_ta: '',
+    Gia_ban: 0,
+    Don_vi_tinh: '',
+    So_luong_ton: 0
   });
 
   const [error, setError] = useState('');
@@ -21,20 +21,20 @@ function ThanhPhamModal({ visible, onHide, onSuccess, initialData }) {
     if (initialData) {
       setFormData({
         Id: initialData.Id,
-        ten_thanh_pham: initialData.ten_thanh_pham,
-        mo_ta: initialData.mo_ta,
-        gia_ban: initialData.gia_ban,
-        don_vi_tinh: initialData.don_vi_tinh,
-        so_luong_ton: initialData.so_luong_ton,
+        Ten_thanh_pham: initialData.Ten_thanh_pham,
+        Mo_ta: initialData.Mo_ta,
+        Gia_ban: initialData.Gia_ban,
+        Don_vi_tinh: initialData.Don_vi_tinh,
+        So_luong_ton: initialData.So_luong_ton
       });
     } else {
       setFormData({
         Id: null,
-        ten_thanh_pham: '',
-        mo_ta: '',
-        gia_ban: 0,
-        don_vi_tinh: '',
-        so_luong_ton: 0,
+        Ten_thanh_pham: '',
+        Mo_ta: '',
+        Gia_ban: 0,
+        Don_vi_tinh: '',
+        So_luong_ton: 0
       });
     }
     setError('');
@@ -42,35 +42,35 @@ function ThanhPhamModal({ visible, onHide, onSuccess, initialData }) {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "gia_ban" || name === "so_luong_ton" ? Number(value) || 0 : value
-    }));
+    setFormData((prev) => {
+      const updatedData = { ...prev, [name]: name === 'Gia_ban' || name === 'So_luong_ton' ? Number(value) || 0 : value };
+      return updatedData;
+    });
   };
 
   const handleSubmit = async () => {
     setError('');
 
     // Kiểm tra dữ liệu hợp lệ
-    if (!formData.ten_thanh_pham.trim()) {
+    if (!formData.Ten_thanh_pham.trim()) {
       setError('Tên thành phẩm không được để trống!');
       return;
     }
-    if (!formData.don_vi_tinh.trim()) {
+    if (!formData.Don_vi_tinh.trim()) {
       setError('Đơn vị tính không được để trống!');
       return;
     }
-    if (formData.gia_ban < 0) {
+    if (formData.Gia_ban < 0) {
       setError('Giá bán không thể nhỏ hơn 0!');
       return;
     }
-    if (formData.so_luong_ton < 0) {
+    if (formData.So_luong_ton < 0) {
       setError('Số lượng tồn không thể nhỏ hơn 0!');
       return;
     }
 
     try {
-      console.log("Dữ liệu gửi đi:", formData); // Debug dữ liệu gửi đi
+      console.log('Dữ liệu gửi đi:', formData); // Debug dữ liệu gửi đi
 
       if (formData.Id) {
         await ThanhPhamService.update(formData.Id, formData);
@@ -86,35 +86,67 @@ function ThanhPhamModal({ visible, onHide, onSuccess, initialData }) {
   };
 
   return (
-    <Dialog visible={visible} onHide={onHide} header="Thành phẩm" modal>
-      <div className="p-fluid">
-        <label>Tên thành phẩm</label>
-        <InputText name="ten_thanh_pham" value={formData.ten_thanh_pham} onChange={handleChange} />
+    <Dialog
+      visible={visible}
+      onHide={onHide}
+      header="Thông tin thành phẩm"
+      modal
+      className="p-fluid"
+      style={{ width: '450px' }}
+      footer={
+        <div className="flex justify-content-end gap-2">
+          <Button label="Hủy" icon="pi pi-times" className="p-button-text" onClick={onHide} />
+          <Button label="Lưu" icon="pi pi-check" className="p-button-primary" onClick={handleSubmit} />
+        </div>
+      }
+    >
+      <div className="grid">
+        <div className="col-12 mb-2">
+          <label htmlFor="Ten_thanh_pham" className="font-bold block mb-1">
+            Tên thành phẩm
+          </label>
+          <InputText id="Ten_thanh_pham" name="Ten_thanh_pham" value={formData.Ten_thanh_pham} onChange={handleChange} className="w-full" />
+        </div>
 
-        <label>Mô tả</label>
-        <InputText name="mo_ta" type="text" value={formData.mo_ta} onChange={handleChange} />
+        <div className="col-12 mb-2">
+          <label htmlFor="Mo_ta" className="font-bold block mb-1">
+            Mô tả
+          </label>
+          <InputText id="Mo_ta" name="Mo_ta" value={formData.Mo_ta} onChange={handleChange} className="w-full" />
+        </div>
 
-        <label>Giá bán</label>
-        <InputText name="gia_ban" type="number" value={formData.gia_ban} onChange={handleChange} />
+        <div className="col-6 mb-2">
+          <label htmlFor="Gia_ban" className="font-bold block mb-1">
+            Giá bán
+          </label>
+          <InputText id="Gia_ban" name="Gia_ban" type="number" value={formData.Gia_ban} onChange={handleChange} className="w-full" />
+        </div>
 
-        <label>Đơn vị tính</label>
-        <InputText name="don_vi_tinh" value={formData.don_vi_tinh} onChange={handleChange} />
+        <div className="col-6 mb-2">
+          <label htmlFor="Don_vi_tinh" className="font-bold block mb-1">
+            Đơn vị tính
+          </label>
+          <InputText id="Don_vi_tinh" name="Don_vi_tinh" value={formData.Don_vi_tinh} onChange={handleChange} className="w-full" />
+        </div>
 
-        <label>Số lượng tồn</label>
-        <InputText
-          name="so_luong_ton"
-          type="number"
-          value={formData.so_luong_ton}
-          onChange={handleChange}
-          disabled={!!formData.Id}
-        />
+        {/* <div className="col-12 mb-2">
+          <label htmlFor="So_luong_ton" className="font-bold block mb-1">Số lượng tồn</label>
+          <InputText
+            id="So_luong_ton"
+            name="So_luong_ton"
+            type="number"
+            value={formData.So_luong_ton}
+            onChange={handleChange}
+            disabled={!!formData.Id}
+            className="w-full"
+          />
+        </div> */}
 
-        {error && <Message severity="error" text={error} />}
-      </div>
-
-      <div className="mt-3">
-        <Button label="Lưu" icon="pi pi-check" onClick={handleSubmit} className="p-button-success" />
-        <Button label="Hủy" icon="pi pi-times" className="p-button-secondary" onClick={onHide} />
+        {error && (
+          <div className="col-12">
+            <Message severity="error" text={error} className="w-full" />
+          </div>
+        )}
       </div>
     </Dialog>
   );

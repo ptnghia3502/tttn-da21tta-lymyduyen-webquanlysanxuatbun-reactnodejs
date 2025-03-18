@@ -14,12 +14,10 @@ const ThanhPhamService = {
   },
 
   async create(data) {
+
+    // vậy cho nhanh
     const payload = {
-      ten_thanh_pham: data.ten_thanh_pham,
-      mo_ta: data.mo_ta,
-      gia_ban: data.gia_ban,
-      don_vi_tinh: data.don_vi_tinh,
-      so_luong_ton: data.so_luong_ton,
+      ...data
     };
     console.log('Dữ liệu gửi lên:', payload);
     await axiosInstance.post(API_URL, payload);
@@ -27,18 +25,14 @@ const ThanhPhamService = {
 
   async update(id, data) {
     const payload = {
-      ten_thanh_pham: data.ten_thanh_pham,
-      mo_ta: data.mo_ta,
-      gia_ban: data.gia_ban,
-      don_vi_tinh: data.don_vi_tinh,
-      so_luong_ton: data.so_luong_ton,
+      ...data
     };
     await axiosInstance.put(`${API_URL}/${id}`, payload);
   },
 
   async delete(id) {
     await axiosInstance.delete(`${API_URL}/${id}`);
-  },
+  }
 };
 
 export default ThanhPhamService;

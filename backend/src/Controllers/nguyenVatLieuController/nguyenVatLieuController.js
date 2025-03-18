@@ -383,7 +383,8 @@ router.put('/:id', verifyToken, checkRole(['Admin']), async (req, res) => {
     //     message: 'Tên nguyên vật liệu đã tồn tại'
     //   });
     // }
-
+    console.log(req.body);
+    
     await NguyenVatLieu.update(req.params.id, req.body);
     res.json({
       success: true,
