@@ -1,7 +1,6 @@
 import axiosInstance from "../redux/axiosInstance.mjs";
 
-const API_URL = `${process.env.URL_REACT || "https://quanly-sanxuat-tts-vnpt.onrender.com"}/api/user`;
-
+const API_URL = `${process.env.NEXT_PUBLIC_URL_REACT}/api/users`;
 const UserService = {
   // Đăng nhập
   async login(username, password) {
@@ -9,6 +8,7 @@ const UserService = {
     return response.data; // { token, user }
   },
 
+  
   // Làm mới token
   async refreshToken(refreshToken) {
     const response = await axiosInstance.post(`${API_URL}/refresh-token`, { refreshToken });

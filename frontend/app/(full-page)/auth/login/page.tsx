@@ -12,7 +12,7 @@ import { classNames } from 'primereact/utils';
 import Cookies from 'js-cookie';
 import { useDispatch } from 'react-redux';
 import { loginSuccess } from '../../../redux/authSlice.mjs'; // Đổi từ .mjs thành .js
-import axios from 'axios';
+import axiosInstance from '@/app/redux/axiosInstance.mjs';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -31,13 +31,13 @@ const LoginPage = () => {
   const clickLogin = async () => {
     try {
       setLoading(true);
-      const response = await axios.post<{ token: string; user: any }>(`${process.env.NEXT_PUBLIC_URL_REACT}/api/users/login`, {
+      const response = await axiosInstance.post<{ token: string; user:any }>("http://localhost:3001/api/users/login", {
         username,
         password,
       });
 
       if (response.status === 200) {
-        const { token, user } = response.data.data;
+        const { token, user } = response.data.data; 
         console.log('token', response.data);
         
         dispatch(loginSuccess({ user, isAuthenticated: true, token }));
@@ -66,7 +66,7 @@ const LoginPage = () => {
         <div style={{ borderRadius: '56px', padding: '0.3rem', background: 'linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)' }}>
           <div className="w-full surface-card py-8 px-5 sm:px-8" style={{ borderRadius: '53px' }}>
             <div className="text-center mb-5">
-              <div className="text-900 text-3xl font-medium mb-3">Chào mừng, Hệ Thống Quản Lý Sản Xuất Bún</div>
+              <div className="text-900 text-3xl font-medium mb-3">Chào mừng, Hệ Thống Quản Lý Sản Xuất </div>
             </div>
 
             <div>

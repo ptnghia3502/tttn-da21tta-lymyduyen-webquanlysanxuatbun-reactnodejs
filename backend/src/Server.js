@@ -94,7 +94,7 @@ try {
     });
   });
 
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 3001;
 
   // Thêm xử lý lỗi khi start server
   const server = app.listen(PORT, () => {

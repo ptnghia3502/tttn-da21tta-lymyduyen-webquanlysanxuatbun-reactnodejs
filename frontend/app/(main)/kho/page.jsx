@@ -5,19 +5,18 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-import NguyenLieuService from '../../services/nguyenlieuService';
-import NguyenLieuModal from '../../modal/NguyenLieuModal'; // CHú ý model khác với modal??
+import KhoService from '../../services/tonkhoService';
+import TonKhoModal from '../../modal/TonKhoModal';
 
-const NguyenLieuPage = () => {
+const KhoPage = () => {
   const [dataList, setDataList] = useState([]);
   const [displayDialog, setDisplayDialog] = useState(false);
   const [isNew, setIsNew] = useState(false);
-  const [formData, setFormData] = useState({ // phần này chưa fix nhưng chú ý lại key phù hợp với form
-    ten: '',
-    loai: '',
-    so_luong: 0,
-    don_vi: '',
-    trang_thai: ''
+  const [formData, setFormData] = useState({
+    id: 0,
+    tenSanPham: '',
+    soLuongTon: 0,
+    ngayCapNhat: '',
   });
 
   const toast = useRef(null);
@@ -28,16 +27,8 @@ const NguyenLieuPage = () => {
 
   const fetchData = async () => {
     try {
-      const response = await NguyenLieuService.getAll();
-
-      //Fix: sửa lại reponse.data phù hợp với api trả về - phối hợp với BE
-
-      //Anh thấy có trả về phần pagin ở BE. Phối hợp lại có cần thiết hay không??
-      if (response.success) {
-        setDataList(Array.isArray(response.data) ? response.data : []);
-      } else {
-        setDataList([]);
-      }
+      const response = await KhoService.getAll();
+      setDataList(response.success ? (Array.isArray(response.data) ? response.data : []) : []);
     } catch (error) {
       showError('Lỗi khi tải dữ liệu');
     }
@@ -52,7 +43,7 @@ const NguyenLieuPage = () => {
   };
 
   const openNew = () => {
-    setFormData({ ten: '', loai: '', so_luong: 0, don_vi: '', trang_thai: '' });
+    setFormData({ id: 0, tenSanPham: '', soLuongTon: 0, ngayCapNhat: '' });
     setIsNew(true);
     setDisplayDialog(true);
   };
@@ -75,7 +66,7 @@ const NguyenLieuPage = () => {
 
   const deleteData = async (id) => {
     try {
-      await NguyenLieuService.delete(id);
+      await KhoService.delete(id);
       fetchData();
       showSuccess('Xóa thành công');
     } catch (error) {
@@ -83,12 +74,12 @@ const NguyenLieuPage = () => {
     }
   };
 
-  const saveData = async () => {
+  const saveData = async (formData) => {
     try {
       if (isNew) {
-        await NguyenLieuService.create(formData);
+        await KhoService.create(formData);
       } else {
-        await NguyenLieuService.update(formData.id, formData);
+        await KhoService.update(formData.id, formData);
       }
       fetchData();
       setDisplayDialog(false);
@@ -98,29 +89,26 @@ const NguyenLieuPage = () => {
     }
   };
 
-  const onInputChange = (e, name) => {
-    const val = (e.target && e.target.value) || '';
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: val
-    }));
-  };
-
   return (
     <div className="p-grid">
       <Toast ref={toast} />
       <div className="p-col-12">
         <div className="card">
-          <h1>Quản Lý Nguyên Liệu</h1>
+          <h1>Quản Lý Kho</h1>
           <div style={{ marginBottom: '10px' }}>
-            <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success" onClick={openNew} size='small' /> {/* Chú ý lại size */}
+            <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success" onClick={openNew} size='small' />
           </div>
+          <TonKhoModal
+            visible={displayDialog}
+            initialData={formData}
+            isNew={isNew}
+            onHide={() => setDisplayDialog(false)}
+            onSave={saveData}
+          />
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
-            <Column field="Ten_nguyen_lieu" header="Tên"></Column>
-            <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
-            <Column field="So_luong_ton" header="Số Lượng"></Column>
-            <Column field="Gia" header="Giá"></Column>
-            {/* <Column field="trang_thai" header="Trạng Thái"></Column> */}
+            <Column field="tenSanPham" header="Tên Sản Phẩm"></Column>
+            <Column field="soLuongTon" header="Số Lượng Tồn"></Column>
+            <Column field="ngayCapNhat" header="Ngày Cập Nhật"></Column>
             <Column
               body={(rowData) => (
                 <>
@@ -136,4 +124,4 @@ const NguyenLieuPage = () => {
   );
 };
 
-export default NguyenLieuPage;
+export default KhoPage;

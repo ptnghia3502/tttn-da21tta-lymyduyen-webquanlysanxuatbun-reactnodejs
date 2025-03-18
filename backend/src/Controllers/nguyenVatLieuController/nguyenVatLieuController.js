@@ -376,13 +376,13 @@ router.put('/:id', verifyToken, checkRole(['Admin']), async (req, res) => {
       });
     }
 
-    const nameExists = await NguyenVatLieu.checkExists(req.body.Ten_nguyen_lieu, req.params.id);
-    if (nameExists) {
-      return res.status(400).json({
-        success: false,
-        message: 'Tên nguyên vật liệu đã tồn tại'
-      });
-    }
+    // const nameExists = await NguyenVatLieu.checkExists(req.body.Ten_nguyen_lieu, req.params.Id);
+    // if (nameExists) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: 'Tên nguyên vật liệu đã tồn tại'
+    //   });
+    // }
 
     await NguyenVatLieu.update(req.params.id, req.body);
     res.json({

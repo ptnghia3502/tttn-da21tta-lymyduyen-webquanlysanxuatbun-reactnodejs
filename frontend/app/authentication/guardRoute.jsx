@@ -45,7 +45,6 @@ const GuardRoute = ({ element: Element, allowedRoles }) => {
         <CircularProgress />
       </Box>
     );
-    debugger;
 
   if (userRole === "admin" || (userRole && allowedRoles.includes(userRole))) {
     return <Element />;

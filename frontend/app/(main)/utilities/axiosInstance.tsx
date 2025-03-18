@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_URL_REACT || "https://quanly-sanxuat-tts-vnpt.onrender.com",
+  baseURL: process.env.NEXT_PUBLIC_URL_REACT || "http://localhost:3001",
   headers: {
     "Content-Type": "application/json",
   },
