@@ -6,6 +6,8 @@ const nguyenVatLieuRoutes = require('./Routers/nguyenVatLieuRoutes/nguyenVatLieu
 const userRoutes = require('./Routers/nguoiDungRouter/userRouters');
 const roleRoutes = require('./Routers/roleRouter/roleRouters');
 const thanhPhamRoutes = require('./Routers/thanhphamRoutes/thanhphamRoutes');
+const nhapKhoRoutes = require('./Controllers/nhapKhoController/nhapKhoController');
+const xuatKhoRoutes = require('./Controllers/xuatKhoController/xuatKhoController');
 const connection = require('./config/database');
 const setupSwagger = require('./config/swagger');
 const helmet = require('helmet');
@@ -78,6 +80,8 @@ try {
   app.use('/api', nguyenVatLieuRoutes);
   app.use('/api', roleRoutes);
   app.use('/api', thanhPhamRoutes);
+  app.use('/api/nhap-kho', nhapKhoRoutes);
+  app.use('/api/xuat-kho', xuatKhoRoutes);
   
   // Test route
   app.get('/', (req, res) => {
@@ -128,11 +132,11 @@ try {
     app._router.stack.forEach(print.bind(null, []))
   }).on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.log(`Port ${PORT} is busy, trying with port ${PORT + 1}`);
+      console.log(`Port ${PORT} is busy, trying with port ${Number(PORT) + 1}`);
       // Thử với port mới
-      app.listen(PORT + 1, () => {
-        console.log(`Server is running on port ${PORT + 1}`);
-        console.log(`Swagger documentation available at http://localhost:${PORT + 1}/api-docs`);
+      app.listen(Number(PORT) + 1, () => {
+        console.log(`Server is running on port ${Number(PORT) + 1}`);
+        console.log(`Swagger documentation available at http://localhost:${Number(PORT) + 1}/api-docs`);
       });
     } else {
       console.error('Server error:', err);
