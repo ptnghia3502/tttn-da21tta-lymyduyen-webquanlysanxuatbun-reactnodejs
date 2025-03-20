@@ -437,11 +437,16 @@ const jwt = require('jsonwebtoken');
  *             required:
  *               - Ten_cong_thuc
  *               - nguyen_lieu
+ *               - Mo_ta
  *             properties:
  *               Ten_cong_thuc:
  *                 type: string
  *                 description: Tên công thức
  *                 example: "Công thức 1"
+ *               Mo_ta:
+ *                 type: string
+ *                 description: Mô tả công thức
+ *                 example: "Công thức sản xuất thành phẩm"
  *               nguyen_lieu:
  *                 type: array
  *                 description: Danh sách nguyên vật liệu trong công thức
@@ -1030,8 +1035,8 @@ const getCongThucById = async (req, res) => {
 // Cập nhật công thức
 const updateCongThuc = async (req, res) => {
   try {
-    const congThucId = req.params.id;
-    const { Ten_cong_thuc, nguyen_lieu } = req.body;
+    const { congThucId } = req.params;
+    const { Ten_cong_thuc, Mo_ta, nguyen_lieu } = req.body;
 
     // Validate dữ liệu
     if (!Ten_cong_thuc || !nguyen_lieu || !nguyen_lieu.length) {
@@ -1041,9 +1046,17 @@ const updateCongThuc = async (req, res) => {
       });
     }
 
+    // Chuyển đổi trường So_luong thành So_luong_can cho mỗi nguyên liệu
+    const formattedNguyenLieu = nguyen_lieu.map(item => ({
+      Nguyen_vat_lieu_id: item.Nguyen_lieu_id,
+      So_luong_can: item.So_luong,
+      Don_vi_tinh: item.Don_vi_tinh || 'kg' // Giá trị mặc định nếu không có
+    }));
+
     const congThuc = await ThanhPham.updateCongThuc(congThucId, {
       Ten_cong_thuc,
-      nguyen_lieu
+      Mo_ta,
+      nguyen_lieu: formattedNguyenLieu
     });
 
     res.json({

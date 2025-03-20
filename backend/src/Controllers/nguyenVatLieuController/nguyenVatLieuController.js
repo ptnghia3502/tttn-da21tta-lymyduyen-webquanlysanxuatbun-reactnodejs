@@ -29,7 +29,7 @@ const router = express.Router();
  *         Mo_ta:
  *           type: string
  *           description: Description of the material
- *         Don_vi:
+ *         Don_vi_tinh:
  *           type: string
  *           description: Unit of measurement
  *         So_luong:
@@ -42,7 +42,7 @@ const router = express.Router();
  *         Id: 1
  *         Ten_nguyen_lieu: Bột gạo
  *         Mo_ta: Bột gạo làm bún
- *         Don_vi: kg
+ *         Don_vi_tinh: kg
  *         So_luong: 100
  *         Gia: 15000
  */
@@ -160,7 +160,7 @@ const router = express.Router();
  *               Mo_ta:
  *                 type: string
  *                 description: Description of the material
- *               Don_vi:
+ *               Don_vi_tinh:
  *                 type: string
  *                 description: Unit of measurement
  *               So_luong:
@@ -224,7 +224,7 @@ const router = express.Router();
  *               Mo_ta:
  *                 type: string
  *                 description: Description of the material
- *               Don_vi:
+ *               Don_vi_tinh:
  *                 type: string
  *                 description: Unit of measurement
  *               So_luong:
