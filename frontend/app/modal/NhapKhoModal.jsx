@@ -156,24 +156,36 @@ const NhapKhoModal = ({ visible, onHide, onSuccess, toast }) => {
       style={{ width: '80vw' }} 
       footer={footer} 
       onHide={onHide}
+      className="p-fluid"
     >
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12">
-          <label htmlFor="ghiChu">Ghi chú</label>
+      <div className="grid">
+        <div className="col-12 mb-4">
+          <label htmlFor="ghiChu" className="font-medium mb-2 block">Ghi chú</label>
           <InputTextarea 
             id="ghiChu" 
             value={ghiChu} 
             onChange={(e) => setGhiChu(e.target.value)} 
             rows={3} 
             placeholder="Nhập ghi chú cho phiếu nhập kho"
+            className="w-full"
           />
         </div>
 
-        <div className="field col-12">
-          <h4>Thêm chi tiết nhập kho</h4>
+        <div className="col-12">
+          <div className="flex align-items-center gap-3 mb-3">
+            <h4 className="m-0">Thêm chi tiết nhập kho</h4>
+            <Button 
+              label="Thêm" 
+              icon="pi pi-plus" 
+              onClick={addChiTiet}
+              className="p-button-sm"
+              style={{ width: '100px' }}
+            />
+          </div>
+          
           <div className="grid">
-            <div className="field col-5">
-              <label htmlFor="nguyenVatLieu">Nguyên vật liệu</label>
+            <div className="col-7 field mb-4">
+              <label htmlFor="nguyenVatLieu" className="font-medium mb-2 block">Nguyên vật liệu</label>
               <Dropdown 
                 id="nguyenVatLieu" 
                 value={selectedNVL} 
@@ -186,8 +198,8 @@ const NhapKhoModal = ({ visible, onHide, onSuccess, toast }) => {
               />
             </div>
 
-            <div className="field col-5">
-              <label htmlFor="soLuong">Số lượng</label>
+            <div className="col-4 field mb-4">
+              <label htmlFor="soLuong" className="font-medium mb-2 block">Số lượng</label>
               <div className="p-inputgroup">
                 <InputNumber 
                   id="soLuong" 
@@ -196,30 +208,27 @@ const NhapKhoModal = ({ visible, onHide, onSuccess, toast }) => {
                   min={1} 
                   placeholder="Nhập số lượng"
                   showButtons
+                  className="w-full"
+                  style={{ maxWidth: '150px' }}
                 />
                 <span className="p-inputgroup-addon">
                   {selectedNVL?.Don_vi_tinh || 'Đơn vị'}
                 </span>
               </div>
             </div>
-
-            <div className="field col-2 flex align-items-end">
-              <Button 
-                label="Thêm" 
-                icon="pi pi-plus" 
-                onClick={addChiTiet} 
-                className="w-full"
-              />
-            </div>
           </div>
         </div>
 
-        <div className="field col-12">
-          <h4>Danh sách nguyên vật liệu nhập kho</h4>
-          <DataTable value={chiTiet} emptyMessage="Chưa có nguyên vật liệu nào">
+        <div className="col-12">
+          <h4 className="mb-3">Danh sách nguyên vật liệu nhập kho</h4>
+          <DataTable 
+            value={chiTiet} 
+            emptyMessage="Chưa có nguyên vật liệu nào"
+            className="mb-3"
+          >
             <Column field="Ten_nguyen_lieu" header="Tên nguyên vật liệu" />
-            <Column field="So_luong" header="Số lượng" />
-            <Column field="Don_vi_tinh" header="Đơn vị tính" />
+            <Column field="So_luong" header="Số lượng" style={{ width: '150px' }} />
+            <Column field="Don_vi_tinh" header="Đơn vị tính" style={{ width: '150px' }} />
             <Column body={actionBodyTemplate} exportable={false} style={{ width: '80px' }} />
           </DataTable>
         </div>

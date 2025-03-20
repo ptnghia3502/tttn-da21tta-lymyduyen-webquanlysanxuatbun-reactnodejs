@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -19,7 +19,7 @@ const ThanhPhamPage = () => {
     Id: null,
     Ten_thanh_pham: '',
     Don_vi_tinh: '',
-    Gia: 0
+    Gia_ban: 0
   });
 
   const toast = useRef(null);
@@ -31,6 +31,7 @@ const ThanhPhamPage = () => {
   const fetchData = async () => {
     try {
       const response = await ThanhPhamService.getAll();
+      console.log(response.data); // Kiểm tra dữ liệu nhận được
       if (response.success) {
         setDataList(Array.isArray(response.data) ? response.data : []);
       } else {
@@ -50,7 +51,7 @@ const ThanhPhamPage = () => {
   };
 
   const openNew = () => {
-    setFormData({ Id: null, Ten_thanh_pham: '', Gia: 0, Don_vi_tinh: '' });
+    setFormData({ Id: null, Ten_thanh_pham: '', Gia_ban: 0, Don_vi_tinh: '' });
     setIsNew(true);
     setDisplayDialog(true);
   };
@@ -86,6 +87,30 @@ const ThanhPhamPage = () => {
     setDisplayXuatKho(true);
   };
 
+  const handleXuatKho = async (id, soLuongXuat) => {
+    try {
+      await ThanhPhamService.xuatKho(id, soLuongXuat);
+      fetchData();
+      showSuccess('Xuất kho thành công');
+      setDisplayXuatKho(false);
+    } catch (error) {
+      showError('Lỗi khi xuất kho');
+    }
+  };
+
+  const formatCurrency = (value) => {
+    if (!value || isNaN(value)) return '';
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(value);
+  };
+
+  const priceBodyTemplate = (rowData) => {
+    console.log("Dữ liệu hàng:", rowData);
+    return formatCurrency(rowData.Gia_ban);
+  };
+
   return (
     <div className="p-grid">
       <Toast ref={toast} />
@@ -93,8 +118,8 @@ const ThanhPhamPage = () => {
       <div className="p-col-12">
         <div className="card">
           <h1>Quản Lý Thành Phẩm</h1>
-          <div style={{ marginBottom: '10px' }}>
-            <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} size='small' />
+          <div style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}>
+            <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success" onClick={openNew} size='small' />
             <Button label="Xuất kho" icon="pi pi-upload" className="p-button-info" onClick={() => setDisplayXuatKho(true)} size='small' />
           </div>
           <ThanhPhamModal
@@ -113,7 +138,7 @@ const ThanhPhamPage = () => {
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="Ten_thanh_pham" header="Tên"></Column>
             <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
-            <Column field="Gia" header="Giá"></Column>
+            <Column field="Gia_ban" header="Giá" body={priceBodyTemplate}></Column>
             <Column
               body={(rowData) => (
                 <>
