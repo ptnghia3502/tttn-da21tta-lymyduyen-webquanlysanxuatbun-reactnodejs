@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
+import { InputNumber } from 'primereact/inputnumber';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import NguyenVatLieuService from '../services/nguyenvatlieuService';
 
@@ -44,6 +45,13 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
       const updatedData = { ...prev, [name]: value };
       return updatedData;
     });
+  };
+
+  const handleGiaChange = (e) => {
+    setFormData(prev => ({
+      ...prev,
+      Gia: e.value || 0
+    }));
   };
 
   const handleSubmit = async () => {
@@ -136,7 +144,15 @@ function NguyenVatLieuModal({ visible, onHide, onSuccess, initialData }) {
           <label htmlFor="Gia" className="font-bold mb-2 block">
             Giá
           </label>
-          <InputText id="Gia" name="Gia" type="number" value={formData.Gia} onChange={handleChange} className="w-full" />
+          <InputNumber
+            id="Gia"
+            value={formData.Gia}
+            onValueChange={handleGiaChange}
+            mode="currency"
+            currency="VND"
+            locale="vi-VN"
+            className="w-full"
+          />
         </div>
 
         {error && (
