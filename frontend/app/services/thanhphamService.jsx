@@ -14,24 +14,37 @@ const ThanhPhamService = {
   },
 
   async create(data) {
-
-    // vậy cho nhanh
+    // Chuẩn bị dữ liệu gửi lên
     const payload = {
-      ...data
+      Ten_thanh_pham: data.Ten_thanh_pham,
+      Don_vi_tinh: data.Don_vi_tinh,
+      Gia_ban: parseFloat(data.Gia_ban),
+      So_luong: parseFloat(data.So_luong || 0),
+      Mo_ta: data.Mo_ta
     };
-    console.log('Dữ liệu gửi lên:', payload);
-    await axiosInstance.post(API_URL, payload);
+    
+    console.log('Dữ liệu gửi lên khi tạo thành phẩm:', payload);
+    const response = await axiosInstance.post(API_URL, payload);
+    return response.data;
   },
 
   async update(id, data) {
     const payload = {
-      ...data
+      Ten_thanh_pham: data.Ten_thanh_pham,
+      Don_vi_tinh: data.Don_vi_tinh,
+      Gia_ban: parseFloat(data.Gia_ban),
+      So_luong: data.So_luong !== undefined ? parseFloat(data.So_luong) : undefined,
+      Mo_ta: data.Mo_ta
     };
-    await axiosInstance.put(`${API_URL}/${id}`, payload);
+    
+    console.log(`Dữ liệu gửi lên khi cập nhật thành phẩm ID=${id}:`, payload);
+    const response = await axiosInstance.put(`${API_URL}/${id}`, payload);
+    return response.data;
   },
 
   async delete(id) {
-    await axiosInstance.delete(`${API_URL}/${id}`);
+    const response = await axiosInstance.delete(`${API_URL}/${id}`);
+    return response.data;
   }
 };
 

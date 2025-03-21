@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
@@ -8,6 +8,8 @@ import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import ThanhPhamService from '../../services/thanhphamService';
 import ThanhPhamModal from '../../modal/ThanhPhamModal';
 import XuatKhoModal from '../../modal/XuatKhoModal';
+import CongThucModal from '../../modal/CongThucModal';
+import SanXuatModal from '../../modal/SanXuatModal';
 
 const ThanhPhamPage = () => {
   const [dataList, setDataList] = useState([]);
@@ -19,8 +21,13 @@ const ThanhPhamPage = () => {
     Id: null,
     Ten_thanh_pham: '',
     Don_vi_tinh: '',
-    Gia_ban: 0
+    Gia: 0
   });
+  
+  // State cho modal công thức và sản xuất
+  const [displayCongThucModal, setDisplayCongThucModal] = useState(false);
+  const [displaySanXuatModal, setDisplaySanXuatModal] = useState(false);
+  const [selectedCongThucId, setSelectedCongThucId] = useState(null);
 
   const toast = useRef(null);
 
@@ -31,7 +38,6 @@ const ThanhPhamPage = () => {
   const fetchData = async () => {
     try {
       const response = await ThanhPhamService.getAll();
-      console.log(response.data); // Kiểm tra dữ liệu nhận được
       if (response.success) {
         setDataList(Array.isArray(response.data) ? response.data : []);
       } else {
@@ -51,7 +57,7 @@ const ThanhPhamPage = () => {
   };
 
   const openNew = () => {
-    setFormData({ Id: null, Ten_thanh_pham: '', Gia_ban: 0, Don_vi_tinh: '' });
+    setFormData({ Id: null, Ten_thanh_pham: '', Gia: 0, Don_vi_tinh: '' });
     setIsNew(true);
     setDisplayDialog(true);
   };
@@ -86,29 +92,58 @@ const ThanhPhamPage = () => {
     setSelectedItem(item);
     setDisplayXuatKho(true);
   };
-
-  const handleXuatKho = async (id, soLuongXuat) => {
-    try {
-      await ThanhPhamService.xuatKho(id, soLuongXuat);
-      fetchData();
-      showSuccess('Xuất kho thành công');
-      setDisplayXuatKho(false);
-    } catch (error) {
-      showError('Lỗi khi xuất kho');
-    }
+  
+  // Mở modal thêm/sửa công thức
+  const openCongThucModal = (thanhPham, congThucId = null) => {
+    setSelectedItem(thanhPham);
+    setSelectedCongThucId(congThucId);
+    setDisplayCongThucModal(true);
+  };
+  
+  // Mở modal sản xuất
+  const openSanXuatModal = (thanhPham) => {
+    setSelectedItem(thanhPham);
+    setDisplaySanXuatModal(true);
   };
 
-  const formatCurrency = (value) => {
-    if (!value || isNaN(value)) return '';
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
-    }).format(value);
-  };
-
-  const priceBodyTemplate = (rowData) => {
-    console.log("Dữ liệu hàng:", rowData);
-    return formatCurrency(rowData.Gia_ban);
+  // Render nút hành động
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <div className="flex gap-2">
+        <Button 
+          size="small" 
+          icon="pi pi-pencil" 
+          className="p-button-rounded p-button-success mr-2" 
+          onClick={() => editData(rowData)} 
+          tooltip="Sửa thông tin" 
+          tooltipOptions={{ position: 'top' }}
+        />
+        <Button 
+          size="small" 
+          icon="pi pi-list" 
+          className="p-button-rounded p-button-info mr-2" 
+          onClick={() => openCongThucModal(rowData)} 
+          tooltip="Quản lý công thức" 
+          tooltipOptions={{ position: 'top' }}
+        />
+        <Button 
+          size="small" 
+          icon="pi pi-cog" 
+          className="p-button-rounded p-button-warning mr-2" 
+          onClick={() => openSanXuatModal(rowData)} 
+          tooltip="Sản xuất" 
+          tooltipOptions={{ position: 'top' }}
+        />
+        <Button 
+          size="small" 
+          icon="pi pi-trash" 
+          className="p-button-rounded p-button-danger" 
+          onClick={() => confirmDelete(rowData.Id)} 
+          tooltip="Xóa" 
+          tooltipOptions={{ position: 'top' }}
+        />
+      </div>
+    );
   };
 
   return (
@@ -118,8 +153,8 @@ const ThanhPhamPage = () => {
       <div className="p-col-12">
         <div className="card">
           <h1>Quản Lý Thành Phẩm</h1>
-          <div style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}>
-            <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success" onClick={openNew} size='small' />
+          <div style={{ marginBottom: '10px' }}>
+            <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} size='small' />
             <Button label="Xuất kho" icon="pi pi-upload" className="p-button-info" onClick={() => setDisplayXuatKho(true)} size='small' />
           </div>
           <ThanhPhamModal
@@ -135,18 +170,38 @@ const ThanhPhamPage = () => {
             onSuccess={fetchData}
             toast={toast}
           />
+          
+          {/* Modal quản lý công thức */}
+          {displayCongThucModal && (
+            <CongThucModal
+              visible={displayCongThucModal}
+              thanhPhamId={selectedItem?.Id}
+              congThucId={selectedCongThucId}
+              onHide={() => {
+                setDisplayCongThucModal(false);
+                setSelectedCongThucId(null);
+              }}
+              onSuccess={fetchData}
+            />
+          )}
+          
+          {/* Modal sản xuất */}
+          {displaySanXuatModal && (
+            <SanXuatModal
+              visible={displaySanXuatModal}
+              thanhPhamId={selectedItem?.Id}
+              thanhPhamName={selectedItem?.Ten_thanh_pham}
+              onHide={() => setDisplaySanXuatModal(false)}
+              onSuccess={fetchData}
+            />
+          )}
+          
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="Ten_thanh_pham" header="Tên"></Column>
             <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
-            <Column field="Gia_ban" header="Giá" body={priceBodyTemplate}></Column>
-            <Column
-              body={(rowData) => (
-                <>
-                  <Button size="small" icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editData(rowData)} />
-                  <Button size="small" icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
-                </>
-              )}
-            />
+            <Column field="Gia_ban" header="Giá bán"></Column>
+            <Column field="So_luong" header="Số lượng"></Column>
+            <Column body={actionBodyTemplate} header="Thao tác" style={{ minWidth: '15rem' }} />
           </DataTable>
         </div>
       </div>
