@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Ripple } from 'primereact/ripple';
 import { classNames } from 'primereact/utils';
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useRef } from 'react';
 import { CSSTransition } from 'react-transition-group';
 import { MenuContext } from './context/menucontext';
 import { usePathname, useSearchParams } from 'next/navigation';
@@ -40,6 +40,7 @@ const AppMenuitem: React.FC<AppMenuitemProps> = ({ item, parentKey, index, root,
   const key = parentKey ? parentKey + '-' + index : String(index);
   const isActiveRoute = item.to && pathname === item.to;
   const active = activeMenu === key || activeMenu.startsWith(key + '-');
+  const submenuRef = useRef<HTMLUListElement>(null);
 
   useEffect(() => {
     const onRouteChange = (url: any) => {
@@ -76,8 +77,8 @@ const AppMenuitem: React.FC<AppMenuitemProps> = ({ item, parentKey, index, root,
   };
 
   const subMenu = item.items && item.visible !== false && (
-    <CSSTransition timeout={{ enter: 1000, exit: 450 }} classNames="layout-submenu" in={root ? true : active} key={item.label}>
-      <ul>
+    <CSSTransition nodeRef={submenuRef} timeout={{ enter: 1000, exit: 450 }} classNames="layout-submenu" in={root ? true : active} key={item.label}>
+      <ul ref={submenuRef}>
         {item.items.map((child, i) => (
           <AppMenuitem item={child} index={i} className={child.badgeClass} parentKey={key} key={child.label} selectedRole={selectedRole} onRoleChange={onRoleChange} />
         ))}

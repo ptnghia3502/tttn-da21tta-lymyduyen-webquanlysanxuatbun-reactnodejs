@@ -6,17 +6,19 @@ import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import NguyenVatLieuService from '../../services/nguyenvatlieuService';
-import NguyenVatLieuModal from '../../modal/NguyenVatLieuModal'; 
+import NguyenVatLieuModal from '../../modal/NguyenVatLieuModal';
+import NhapKhoModal from '../../modal/NhapKhoModal';
 
 const NguyenVatLieuPage = () => {
   const [dataList, setDataList] = useState([]);
   const [displayDialog, setDisplayDialog] = useState(false);
+  const [displayNhapKho, setDisplayNhapKho] = useState(false);
   const [isNew, setIsNew] = useState(false);
-  const [formData, setFormData] = useState({ // phần này chưa fix nhưng chú ý lại key phù hợp với form
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [formData, setFormData] = useState({
     Id: null,
     Ten_nguyen_lieu: '',
     Don_vi_tinh: '',
-    // So_luong_ton: '',
     Gia: 0
   });
 
@@ -29,22 +31,15 @@ const NguyenVatLieuPage = () => {
   const fetchData = async () => {
     try {
       const response = await NguyenVatLieuService.getAll();
-      console.log("API Response:", response); // Kiểm tra dữ liệu từ API
-  
       if (response.success) {
-        console.log("Dữ liệu từ API:", response.data); // Log dữ liệu thực tế
         setDataList(Array.isArray(response.data) ? response.data : []);
       } else {
         setDataList([]);
       }
     } catch (error) {
-      console.error("Lỗi khi tải dữ liệu:", error);
       showError("Lỗi khi tải dữ liệu");
     }
   };
-  useEffect(() => {
-    console.log("Danh sách sau khi setDataList:", dataList);
-  }, [dataList]);
 
   const showSuccess = (message) => {
     toast.current.show({ severity: 'success', summary: 'Thành công', detail: message, life: 3000 });
@@ -55,29 +50,26 @@ const NguyenVatLieuPage = () => {
   };
 
   const openNew = () => {
-    setFormData({ Id: null, Ten_nguyen_lieu: '', Gia: 0, So_luong_ton: '', Don_vi_tinh: '' });
+    setFormData({ Id: null, Ten_nguyen_lieu: '', Gia: 0, Don_vi_tinh: '' });
     setIsNew(true);
     setDisplayDialog(true);
   };
 
   const editData = (data) => {
-    console.log(data);
     setFormData({ ...data });
     setIsNew(false);
     setDisplayDialog(true);
   };
 
- const confirmDelete = (id) => {
-  console.log("ID cần xóa:", id); // Kiểm tra ID có hợp lệ không
-  confirmDialog({
-    message: 'Bạn có chắc chắn muốn xóa mục này không?',
-    header: 'Xác nhận xóa',
-    icon: 'pi pi-exclamation-triangle',
-    accept: () => deleteData(id),
-    reject: () => showError('Hủy thao tác xóa')
-  });
-};
-
+  const confirmDelete = (id) => {
+    confirmDialog({
+      message: 'Bạn có chắc chắn muốn xóa mục này không?',
+      header: 'Xác nhận xóa',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => deleteData(id),
+      reject: () => showError('Hủy thao tác xóa')
+    });
+  };
 
   const deleteData = async (id) => {
     try {
@@ -89,29 +81,33 @@ const NguyenVatLieuPage = () => {
     }
   };
 
-  const saveData = async () => {
+  const openNhapKho = (item) => {
+    setSelectedItem(item);
+    setDisplayNhapKho(true);
+  };
+
+  const handleNhapKho = async (id, soLuongNhap) => {
     try {
-      // Save data ở bên modal rồi không cần save ở đây nữa
-      // if (isNew) {
-      //   await NguyenVatLieuService.create(formData);
-      // } else {
-      //   await NguyenVatLieuService.update(formData.Id, formData);
-      // }
+      await NguyenVatLieuService.nhapKho(id, soLuongNhap);
       fetchData();
-      setDisplayDialog(false);
-      showSuccess(isNew ? 'Thêm mới thành công' : 'Cập nhật thành công');
+      showSuccess('Nhập kho thành công');
+      setDisplayNhapKho(false);
     } catch (error) {
-      showError(isNew ? 'Lỗi khi thêm mới' : 'Lỗi khi cập nhật');
+      showError('Lỗi khi nhập kho');
     }
   };
 
-  const onInputChange = (e, name) => {
-    const val = name === "So_luong_ton" ? Number(e.target.value) || 0 : e.target.value;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: val
-    }));
-  };  
+  const formatCurrency = (value) => {
+    if (value === null || value === undefined) return '';
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(value);
+  };
+
+  const priceBodyTemplate = (rowData) => {
+    return formatCurrency(rowData.Gia);
+  };
 
   return (
     <div className="p-grid">
@@ -121,29 +117,31 @@ const NguyenVatLieuPage = () => {
         <div className="card">
           <h1>Quản Lý Nguyên Vật Liệu</h1>
           <div style={{ marginBottom: '10px' }}>
-            <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success" onClick={openNew} size='small' /> {/* Chú ý lại size */}
+            <Button label="Thêm mới" icon="pi pi-plus" className="p-button-success mr-2" onClick={openNew} size='small' />
+            <Button label="Nhập kho" icon="pi pi-download" className="p-button-info" onClick={() => setDisplayNhapKho(true)} size='small' />
           </div>
           <NguyenVatLieuModal
             visible={displayDialog}
             formData={formData}
             isNew={isNew}
             onHide={() => setDisplayDialog(false)}
-            onSuccess={saveData}
-            onInputChange={onInputChange}
-            initialData={formData}
+            onSuccess={fetchData}
+          />
+          <NhapKhoModal
+            visible={displayNhapKho}
+            onHide={() => setDisplayNhapKho(false)}
+            onSuccess={fetchData}
+            toast={toast}
           />
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="Ten_nguyen_lieu" header="Tên"></Column>
             <Column field="Don_vi_tinh" header="Đơn vị tính"></Column>
-            {/* <Column field="So_luong_ton" header="Số Lượng" body={(rowData) => {
-            return Number(rowData.So_luong_ton) || 0; // Chuyển về số nếu có lỗi
-            }} /> */}
-            <Column field="Gia" header="Giá"></Column>
+            <Column field="Gia" header="Giá" body={priceBodyTemplate}></Column>
             <Column
               body={(rowData) => (
                 <>
                   <Button size="small" icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editData(rowData)} />
-                  <Button size="small"  icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
+                  <Button size="small" icon="pi pi-trash" className="p-button-rounded p-button-warning" onClick={() => confirmDelete(rowData.Id)} />
                 </>
               )}
             />

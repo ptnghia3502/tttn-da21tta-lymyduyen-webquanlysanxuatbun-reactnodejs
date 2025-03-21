@@ -30,7 +30,14 @@ const AppMenu = () => {
       items: [
         { label: 'Nguyên liệu', icon: 'pi pi-th-large', to: '/nguyen-vat-lieu' },
         { label: 'Thành phẩm', icon: 'pi pi-box', to: '/thanh-pham' },
-        { label: 'Kho', icon: 'pi pi-box', to: '/kho' },
+        { 
+          label: 'Danh sách', 
+          icon: 'pi pi-database', 
+          items: [
+            { label: 'Nhập kho nguyên vật liệu', icon: 'pi pi-download', to: '/nhap-kho' },
+            { label: 'Xuất kho thành phẩm', icon: 'pi pi-upload', to: '/xuat-kho' }
+          ]
+        },
       ]
     }
   ];
