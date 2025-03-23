@@ -94,14 +94,17 @@ const XuatKhoModal = ({ visible, onHide, onSuccess, toast }) => {
     try {
       setLoading(true);
       
+      // Đảm bảo đúng cấu trúc dữ liệu theo yêu cầu API
       const requestData = {
         Ghi_chu: ghiChu,
         chi_tiet: chiTiet.map(item => ({
           Thanh_pham_id: item.Thanh_pham_id,
-          So_luong: item.So_luong
+          So_luong: parseInt(item.So_luong) // Đảm bảo số lượng là số nguyên
         }))
       };
 
+      console.log('Dữ liệu gửi đi:', JSON.stringify(requestData)); // Log dữ liệu để debug
+      
       const response = await XuatKhoService.create(requestData);
       
       if (response.success) {
@@ -109,13 +112,25 @@ const XuatKhoModal = ({ visible, onHide, onSuccess, toast }) => {
         resetForm();
         onSuccess();
         onHide();
+      } else {
+        // Hiển thị lỗi trả về từ response nếu có
+        toast.current?.show({ 
+          severity: 'error', 
+          summary: 'Lỗi', 
+          detail: response.message || 'Không thể tạo phiếu xuất kho'
+        });
       }
     } catch (error) {
       console.error('Error creating phieu xuat kho:', error);
+      // Hiển thị chi tiết lỗi từ response
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          error.message || 
+                          'Không thể tạo phiếu xuất kho';
       toast.current?.show({ 
         severity: 'error', 
         summary: 'Lỗi', 
-        detail: error.response?.data?.message || 'Không thể tạo phiếu xuất kho' 
+        detail: errorMessage
       });
     } finally {
       setLoading(false);

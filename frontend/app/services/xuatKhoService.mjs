@@ -1,6 +1,6 @@
 import axiosInstance from "../redux/axiosInstance.mjs";
 
-const API_URL = `${process.env.NEXT_PUBLIC_URL_REACT || 'http://localhost:3001'}/api/xuat-kho`;
+const API_URL = `api/xuat-kho`;
 
 const XuatKhoService = {
   // Lấy danh sách phiếu xuất kho
@@ -17,8 +17,20 @@ const XuatKhoService = {
 
   // Tạo phiếu xuất kho mới
   async create(data) {
-    const response = await axiosInstance.post(API_URL, data);
-    return response.data;
+    try {
+      const response = await axiosInstance.post(API_URL, data);
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      console.error('Error in XuatKhoService.create:', error);
+      return {
+        success: false,
+        message: error.response?.data?.message || 'Có lỗi xảy ra',
+        error: error
+      };
+    }
   },
 
   // Cập nhật phiếu xuất kho
