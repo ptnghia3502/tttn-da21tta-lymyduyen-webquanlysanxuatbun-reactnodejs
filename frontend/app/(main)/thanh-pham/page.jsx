@@ -10,6 +10,8 @@ import ThanhPhamModal from '../../modal/ThanhPhamModal';
 import XuatKhoModal from '../../modal/XuatKhoModal';
 import CongThucModal from '../../modal/CongThucModal';
 import SanXuatModal from '../../modal/SanXuatModal';
+import CongThucService from '../../services/congThucService';
+import { Dialog } from 'primereact/dialog';
 
 const ThanhPhamPage = () => {
   const [dataList, setDataList] = useState([]);
@@ -28,6 +30,10 @@ const ThanhPhamPage = () => {
   const [displayCongThucModal, setDisplayCongThucModal] = useState(false);
   const [displaySanXuatModal, setDisplaySanXuatModal] = useState(false);
   const [selectedCongThucId, setSelectedCongThucId] = useState(null);
+  
+  // State cho hiển thị chi tiết công thức
+  const [displayCongThucDetail, setDisplayCongThucDetail] = useState(false);
+  const [congThucDetail, setCongThucDetail] = useState(null);
 
   const toast = useRef(null);
 
@@ -106,6 +112,22 @@ const ThanhPhamPage = () => {
     setDisplaySanXuatModal(true);
   };
 
+  // Xem chi tiết công thức
+  const viewCongThucDetail = async (thanhPham) => {
+    try {
+      const response = await CongThucService.getByThanhPhamId(thanhPham.Id);
+      if (response.success && response.data && response.data.length > 0) {
+        setCongThucDetail(response.data);
+        setDisplayCongThucDetail(true);
+      } else {
+        showError('Thành phẩm này chưa có công thức nào');
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy chi tiết công thức:', error);
+      showError('Không thể lấy thông tin công thức');
+    }
+  };
+
   // Render nút hành động
   const actionBodyTemplate = (rowData) => {
     return (
@@ -124,6 +146,14 @@ const ThanhPhamPage = () => {
           className="p-button-rounded p-button-info mr-2" 
           onClick={() => openCongThucModal(rowData)} 
           tooltip="Quản lý công thức" 
+          tooltipOptions={{ position: 'top' }}
+        />
+        <Button 
+          size="small" 
+          icon="pi pi-eye" 
+          className="p-button-rounded p-button-secondary mr-2" 
+          onClick={() => viewCongThucDetail(rowData)} 
+          tooltip="Xem công thức" 
           tooltipOptions={{ position: 'top' }}
         />
         <Button 
@@ -195,6 +225,33 @@ const ThanhPhamPage = () => {
               onSuccess={fetchData}
             />
           )}
+
+          {/* Dialog xem chi tiết công thức */}
+          <Dialog
+            visible={displayCongThucDetail}
+            onHide={() => {
+              setDisplayCongThucDetail(false);
+              setCongThucDetail(null);
+            }}
+            header="Chi tiết công thức"
+            style={{ width: '70vw' }}
+            maximizable
+          >
+            {congThucDetail && congThucDetail.map((congThuc, index) => (
+              <div key={congThuc.Id} className="mb-4">
+                <h3 className="mb-3">{congThuc.Ten_cong_thuc}</h3>
+                {congThuc.Mo_ta && (
+                  <p className="mb-3 text-gray-600">{congThuc.Mo_ta}</p>
+                )}
+                <DataTable value={congThuc.nguyen_lieu || []} className="mb-4">
+                  <Column field="Ten_nguyen_lieu" header="Nguyên liệu" />
+                  <Column field="So_luong_can" header="Số lượng" />
+                  <Column field="Don_vi_tinh" header="Đơn vị tính" />
+                </DataTable>
+                {index < congThucDetail.length - 1 && <hr className="my-4" />}
+              </div>
+            ))}
+          </Dialog>
           
           <DataTable value={dataList} paginator rows={10} rowsPerPageOptions={[5, 10, 25]} size='small'>
             <Column field="Ten_thanh_pham" header="Tên"></Column>

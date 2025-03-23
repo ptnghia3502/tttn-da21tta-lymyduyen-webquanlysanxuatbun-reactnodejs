@@ -10,6 +10,7 @@ import { Message } from 'primereact/message';
 import { Toast } from 'primereact/toast';
 import CongThucService from '../services/congThucService';
 import NguyenVatLieuService from '../services/nguyenvatlieuService';
+import ThanhPhamService from '../services/thanhphamService';
 
 function CongThucModal({ visible, thanhPhamId, congThucId, onHide, onSuccess }) {
   const toast = useRef(null);
@@ -30,6 +31,21 @@ function CongThucModal({ visible, thanhPhamId, congThucId, onHide, onSuccess }) 
     const fetchData = async () => {
       setLoading(true);
       try {
+        // Lấy thông tin thành phẩm
+        if (thanhPhamId) {
+          const thanhPhamResponse = await ThanhPhamService.getById(thanhPhamId);
+          if (thanhPhamResponse && thanhPhamResponse.success && thanhPhamResponse.data) {
+            const tenThanhPham = thanhPhamResponse.data.Ten_thanh_pham;
+            // Nếu là thêm mới công thức, set tên mặc định
+            if (!congThucId) {
+              setFormData(prev => ({
+                ...prev,
+                Ten_cong_thuc: `Công thức ${tenThanhPham}`
+              }));
+            }
+          }
+        }
+
         // Lấy danh sách nguyên liệu
         console.log('Đang lấy danh sách nguyên vật liệu...');
         const nguyenLieuResponse = await NguyenVatLieuService.getAll();
@@ -72,12 +88,12 @@ function CongThucModal({ visible, thanhPhamId, congThucId, onHide, onSuccess }) 
             setFormData(groupedData);
           }
         } else {
-          // Reset form khi thêm mới
-          setFormData({
-            Ten_cong_thuc: '',
+          // Reset form khi thêm mới (ngoại trừ Ten_cong_thuc đã được set ở trên)
+          setFormData(prev => ({
+            ...prev,
             Mo_ta: '',
             nguyen_lieu: []
-          });
+          }));
         }
       } catch (error) {
         console.error('Lỗi chi tiết khi tải dữ liệu:', error);
