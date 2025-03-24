@@ -16,7 +16,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: process.env.NODE_ENV === 'production' ? 'https://quanly-sanxuat-tts-vnpt.onrender.com' : 'http://localhost:3001',
+        url: process.env.NODE_ENV === 'production' ? 'https://quanly-sanxuat-tts-vnpt.onrender.com/api' : 'http://localhost:3001/api',
         description: 'Development server'
       }
     ],
