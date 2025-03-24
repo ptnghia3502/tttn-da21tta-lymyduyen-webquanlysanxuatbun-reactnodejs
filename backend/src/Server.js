@@ -19,7 +19,7 @@ app.use(helmet());
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:3000", "http://localhost:3001", "https://quanly-sanxuat-tts-vnpt.vercel.app/"],
+  origin: ["http://localhost:3000", "http://localhost:3001", "https://quanly-sanxuat-tts-vnpt.vercel.app"],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
