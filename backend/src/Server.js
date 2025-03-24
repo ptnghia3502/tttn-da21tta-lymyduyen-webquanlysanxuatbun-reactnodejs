@@ -9,7 +9,7 @@ const thanhPhamRoutes = require('./Routers/thanhphamRoutes/thanhphamRoutes');
 const nhapKhoRoutes = require('./Controllers/nhapKhoController/nhapKhoController');
 const xuatKhoRoutes = require('./Controllers/xuatKhoController/xuatKhoController');
 const connection = require('./Config/database');
-const setupSwagger = require('./config/swagger');
+const setupSwagger = require('./Config/swagger');
 const helmet = require('helmet');
 
 const app = express();
