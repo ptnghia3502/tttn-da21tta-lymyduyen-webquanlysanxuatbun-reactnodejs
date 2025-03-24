@@ -1,7 +1,7 @@
 const express = require('express');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const { roleSchema, validate } = require('../../Middleware/validationMiddleware');
-const connection = require('../../config/database');
+const connection = require('../../Config/database');
 const util = require('util');
 const query = util.promisify(connection.query).bind(connection);
 
@@ -193,7 +193,7 @@ router.get('/', verifyToken, checkRole(['Admin']), async (req, res) => {
 router.post('/', verifyToken, checkRole(['Admin']), validate(roleSchema.create), async (req, res) => {
   try {
     const { tenQuyen, moTa } = req.body;
-    
+
     // Kiểm tra quyền đã tồn tại
     const existingRole = await query('SELECT Id FROM Quyen WHERE Ten_quyen = ?', [tenQuyen]);
     if (existingRole.length > 0) {

@@ -3,7 +3,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 import { enqueueSnackbar } from 'notistack';
 
-const apiUrl = process.env.NEXT_PUBLIC_URL_REACT || 'http://localhost:3001'; // Thêm fallback URL
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'; // Thêm fallback URL
 console.log('API URL được cấu hình:', apiUrl);
 
 const axiosInstance = axios.create({
@@ -18,9 +18,9 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    config.headers['Content-Type'] = 
+    config.headers['Content-Type'] =
       config.data instanceof FormData ? 'multipart/form-data' : 'application/json';
-    
+
     console.log(`[Request] ${config.method.toUpperCase()} ${config.baseURL}${config.url}`);
     return config;
   },
@@ -36,7 +36,7 @@ const refreshAccessToken = async () => {
     console.log('Đang làm mới access token...');
     const response = await axios.post(`${apiUrl}/auth/refresh-token`, {}, { withCredentials: true });
     console.log('Kết quả refresh token:', response.data);
-    
+
     if (response.data.EC === 1) {
       const newAccessToken = response.data.DT.accessToken;
       Cookies.set('accessToken', newAccessToken, { secure: true, sameSite: 'strict' });
@@ -66,9 +66,9 @@ axiosInstance.interceptors.response.use(
     } else {
       console.error('Lỗi response không có response object:', error.message);
     }
-    
+
     const originalRequest = error.config;
-    
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       console.log('Phát hiện lỗi 401, đang thử refresh token...');
@@ -79,7 +79,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest); // Gửi lại request cũ với token mới
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

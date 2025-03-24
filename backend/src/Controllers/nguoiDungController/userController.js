@@ -1,7 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const connection = require('../../config/database');
+const connection = require('../../Config/database');
 const { verifyToken, checkRole } = require('../../Middleware/authMiddleware');
 const { userSchema, roleSchema, validate } = require('../../Middleware/validationMiddleware');
 const util = require('util');
@@ -161,7 +161,7 @@ const handleError = (res, error, message) => {
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
-    
+
     console.log('Login attempt:', { username });
 
     if (!username || !password) {
@@ -192,7 +192,7 @@ const login = async (req, res) => {
 
     const user = users[0];
     const isMatch = await bcrypt.compare(password, user.Mat_khau);
-    
+
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -578,7 +578,7 @@ router.put('/change-password', verifyToken, validate(userSchema.changePassword),
     }
 
     const isMatch = await bcrypt.compare(oldPassword, user[0].Mat_khau);
-    
+
     if (!isMatch) {
       return res.status(400).json({
         success: false,
@@ -588,7 +588,7 @@ router.put('/change-password', verifyToken, validate(userSchema.changePassword),
 
     // Hash mật khẩu mới
     const hashedPassword = await bcrypt.hash(newPassword, 10);
-    
+
     // Cập nhật mật khẩu
     await query(
       'UPDATE NguoiDung SET Mat_khau = ? WHERE Id = ?',
@@ -798,7 +798,7 @@ router.get('/:id', verifyToken, checkRole(['Admin']), async (req, res) => {
       WHERE n.Id = ?
       GROUP BY n.Id
     `;
-    
+
     const users = await query(userQuery, [userId]);
     if (users.length === 0) {
       return res.status(404).json({
@@ -913,7 +913,7 @@ router.delete('/:id', verifyToken, checkRole(['Admin']), async (req, res) => {
 
     // Xóa các quyền của người dùng
     await query('DELETE FROM Quyen_NguoiDung WHERE Nguoi_dung_id = ?', [userId]);
-    
+
     // Xóa người dùng
     await query('DELETE FROM NguoiDung WHERE Id = ?', [userId]);
 

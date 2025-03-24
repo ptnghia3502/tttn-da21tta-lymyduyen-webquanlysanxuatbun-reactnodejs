@@ -1,4 +1,4 @@
-const connection = require('../config/database');
+const connection = require('../Config/database');
 const util = require('util');
 const query = util.promisify(connection.query).bind(connection);
 
@@ -119,7 +119,7 @@ class User {
 
   static async assignRoles(userId, roleIds) {
     await query('DELETE FROM Quyen_NguoiDung WHERE Nguoi_dung_id = ?', [userId]);
-    
+
     if (roleIds.length > 0) {
       const values = roleIds.map(roleId => [userId, roleId]);
       return query(

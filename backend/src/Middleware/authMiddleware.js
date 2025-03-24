@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const connection = require('../config/database');
+const connection = require('../Config/database');
 
 /**
  * @swagger
@@ -42,7 +42,7 @@ const checkRole = (requiredRoles) => {
     connection.query(query, [req.userId], (err, results) => {
       if (err) {
         console.error('Database error:', err);
-        return res.status(500).json({ 
+        return res.status(500).json({
           error: 'Database error',
           message: err.message,
           code: err.code
@@ -59,7 +59,7 @@ const checkRole = (requiredRoles) => {
       const hasRequiredRole = requiredRolesLower.some(role => userRoles.includes(role));
 
       if (!hasRequiredRole) {
-        return res.status(403).json({ 
+        return res.status(403).json({
           error: 'Không có quyền truy cập',
           userRoles: results.map(role => role.Ten_quyen),
           requiredRoles: requiredRoles
