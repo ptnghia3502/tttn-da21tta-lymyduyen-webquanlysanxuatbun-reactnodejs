@@ -16,14 +16,14 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3001/api',
+        url: process.env.NODE_ENV === 'production' ? 'https://quanly-sanxuat-tts-vnpt.onrender.com' : 'http://localhost:3001',
         description: 'Development server'
       }
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
+          type: process.env.NODE_ENV === 'production' ? 'https' : 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT'
         }
@@ -49,13 +49,13 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 function setupSwagger(app) {
   // Serve swagger docs
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-  
+
   // Serve swagger spec as JSON
   app.get('/api-docs.json', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(swaggerSpec);
   });
-  
+
   console.log('Swagger documentation available at /api-docs');
 }
 
