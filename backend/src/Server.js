@@ -8,7 +8,7 @@ const roleRoutes = require('./Routers/roleRouter/roleRouters');
 const thanhPhamRoutes = require('./Routers/thanhphamRoutes/thanhphamRoutes');
 const nhapKhoRoutes = require('./Controllers/nhapKhoController/nhapKhoController');
 const xuatKhoRoutes = require('./Controllers/xuatKhoController/xuatKhoController');
-const connection = require('./config/database');
+const connection = require('./Config/database');
 const setupSwagger = require('./config/swagger');
 const helmet = require('helmet');
 
@@ -82,7 +82,7 @@ try {
   app.use('/api', thanhPhamRoutes);
   app.use('/api/nhap-kho', nhapKhoRoutes);
   app.use('/api/xuat-kho', xuatKhoRoutes);
-  
+
   // Test route
   app.get('/', (req, res) => {
     res.json({ message: 'API is running' });

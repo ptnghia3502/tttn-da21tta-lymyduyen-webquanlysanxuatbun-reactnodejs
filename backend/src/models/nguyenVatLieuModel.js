@@ -1,4 +1,4 @@
-const connection = require('../config/database');
+const connection = require('../Config/database');
 const util = require('util');
 const query = util.promisify(connection.query).bind(connection);
 
@@ -7,7 +7,7 @@ class NguyenVatLieu {
     const offset = (page - 1) * limit;
     const whereClause = search ? 'WHERE Ten_nguyen_lieu LIKE ?' : '';
     const searchParam = search ? `%${search}%` : '';
-    
+
     const sql = `
       SELECT * FROM NguyenVatLieu 
       ${whereClause}
@@ -17,7 +17,7 @@ class NguyenVatLieu {
 
     const params = search ? [searchParam, limit, offset] : [limit, offset];
     const results = await query(sql, params);
-    
+
     const countSql = `SELECT COUNT(*) as total FROM NguyenVatLieu ${whereClause}`;
     const countParams = search ? [searchParam] : [];
     const [{ total }] = await query(countSql, countParams);
@@ -49,11 +49,11 @@ class NguyenVatLieu {
         Ngay_cap_nhat
       ) VALUES (?, ?, ?, ?, CURRENT_DATE)
     `;
-    
+
     const result = await query(sql, [
       data.Ten_nguyen_lieu,
       data.Gia,
-      0, 
+      0,
       data.Don_vi_tinh
     ]);
 
@@ -85,10 +85,10 @@ class NguyenVatLieu {
   }
 
   static async checkExists(tenNguyenLieu, excludeId = null) {
-    const sql = excludeId 
+    const sql = excludeId
       ? 'SELECT Id FROM NguyenVatLieu WHERE Ten_nguyen_lieu = ? AND Id != ?'
       : 'SELECT Id FROM NguyenVatLieu WHERE Ten_nguyen_lieu = ?';
-    
+
     const params = excludeId ? [tenNguyenLieu, excludeId] : [tenNguyenLieu];
     const results = await query(sql, params);
     return results.length > 0;

@@ -1,5 +1,5 @@
 // src/models/thanhPhamModel.js
-const connection = require('../config/database');
+const connection = require('../Config/database');
 const util = require('util');
 
 // Tạo hàm query với kiểm tra kết nối
@@ -9,7 +9,7 @@ const query = async (sql, params) => {
     if (connection.state === 'disconnected') {
       await connection.connect();
     }
-    
+
     const queryPromise = util.promisify(connection.query).bind(connection);
     return await queryPromise(sql, params);
   } catch (error) {
@@ -65,10 +65,10 @@ class ThanhPham {
 
   // Kiểm tra tên thành phẩm đã tồn tại
   static async checkExists(tenThanhPham, excludeId = null) {
-    const sql = excludeId 
+    const sql = excludeId
       ? 'SELECT Id FROM ThanhPham WHERE Ten_thanh_pham = ? AND Id != ?'
       : 'SELECT Id FROM ThanhPham WHERE Ten_thanh_pham = ?';
-    
+
     const params = excludeId ? [tenThanhPham, excludeId] : [tenThanhPham];
     const rows = await query(sql, params);
     return rows.length > 0;
@@ -86,7 +86,7 @@ class ThanhPham {
         Mo_ta
       ) VALUES (?, ?, ?, CURDATE(), ?, ?)
     `;
-    
+
     console.log('Insert data:', {
       Ten_thanh_pham: data.Ten_thanh_pham,
       So_luong: data.So_luong,
@@ -192,7 +192,7 @@ class ThanhPham {
           Ngay_tao
         ) VALUES (?, ?, ?, NOW())
       `;
-      
+
       const resultCongThuc = await query(sqlCongThuc, [
         data.Thanh_pham_id,
         data.Ten_cong_thuc,
@@ -221,7 +221,7 @@ class ThanhPham {
       }
 
       await query('COMMIT');
-      
+
       // Lấy thông tin công thức vừa thêm
       const congThuc = await query(
         `SELECT 
@@ -317,7 +317,7 @@ class ThanhPham {
 
       // Xóa chi tiết công thức trước (do có khóa ngoại)
       await query('DELETE FROM ChiTietCongThuc WHERE Cong_thuc_id = ?', [id]);
-      
+
       // Sau đó xóa công thức
       await query('DELETE FROM CongThuc WHERE Id = ?', [id]);
 
@@ -352,9 +352,9 @@ class ThanhPham {
       GROUP BY c.Id, c.Thanh_pham_id, c.Ten_cong_thuc, tp.Ten_thanh_pham
       ORDER BY c.Id DESC
     `;
-    
+
     const results = await query(sql);
-    
+
     // Xử lý kết quả để chuyển đổi chuỗi nguyen_lieu thành mảng JSON
     return results.map(result => ({
       ...result,
@@ -393,7 +393,7 @@ class ThanhPham {
         'SELECT * FROM CongThuc WHERE Id = ?',
         [id]
       );
-      
+
       if (currentCongThuc.length === 0) {
         throw new Error('Không tìm thấy công thức');
       }
@@ -503,9 +503,9 @@ class ThanhPham {
       GROUP BY c.Id, c.Thanh_pham_id, c.Ten_cong_thuc, tp.Ten_thanh_pham
       ORDER BY c.Id DESC
     `;
-    
+
     const results = await query(sql, [thanhPhamId, thanhPhamId]);
-    
+
     // Xử lý kết quả để chuyển đổi chuỗi nguyen_lieu thành mảng JSON
     return results.map(result => ({
       ...result,
