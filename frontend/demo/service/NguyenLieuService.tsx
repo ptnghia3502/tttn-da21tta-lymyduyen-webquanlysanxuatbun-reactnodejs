@@ -4,15 +4,23 @@ import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+interface Material {
+    id: number;
+    name: string;
+    quantity: number;
+    unit: string;
+    supplier: string;
+  }  
 
 const NguyenLieuService = () => {
-    const [materials, setMaterials] = useState([]);
+    const [materials, setMaterials] = useState<Material[]>([]);
 
     useEffect(() => {
-        axios.get('/api/materials')
-            .then(response => setMaterials(response.data))
-            .catch(error => console.error('Lỗi khi tải nguyên liệu:', error));
-    }, []);
+        axios
+          .get<Material[]>("/api/materials")
+          .then((response) => setMaterials(response.data))
+          .catch((error) => console.error("Lỗi khi tải nguyên liệu:", error));
+      }, []);
 
     return (
         <div>

@@ -31,7 +31,9 @@ const LoginPage = () => {
   const clickLogin = async () => {
     try {
       setLoading(true);
-      const response = await axiosInstance.post<{ token: string; user:any }>("http://localhost:3001/api/users/login", {
+      const response = await axiosInstance.post<{
+        data: { token: any; user: any; }; token: string; user:any 
+}>(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/users/login`, {
         username,
         password,
       });

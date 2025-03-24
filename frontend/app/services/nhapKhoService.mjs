@@ -1,6 +1,6 @@
 import axiosInstance from "../redux/axiosInstance.mjs";
 
-const API_URL = `${process.env.NEXT_PUBLIC_URL_REACT || 'http://localhost:3001'}/api/nhap-kho`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/nhap-kho`;
 
 const NhapKhoService = {
   // Lấy danh sách phiếu nhập kho

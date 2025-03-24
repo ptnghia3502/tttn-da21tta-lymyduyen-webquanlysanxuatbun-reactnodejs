@@ -1,6 +1,6 @@
 import axiosInstance from "../redux/axiosInstance.mjs";
 
-const API_URL = `${process.env.NEXT_PUBLIC_URL_REACT}/api/users`;
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/users`;
 const UserService = {
   // Đăng nhập
   async login(username, password) {
